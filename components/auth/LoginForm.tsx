@@ -51,26 +51,46 @@ export function LoginForm({
         {redirectTo ? (
           <input type="hidden" name="redirect" value={redirectTo} />
         ) : null}
-        <Input
-          id="login-email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          label="Correo electrónico"
-          placeholder="tu@correo.com"
-          className="bg-surface-2"
-          error={state?.fieldErrors?.email}
-        />
-        <Input
-          id="login-password"
-          name="password"
-          type="password"
-          autoComplete="current-password"
-          label="Contraseña"
-          placeholder="••••••••"
-          className="bg-surface-2"
-          error={state?.fieldErrors?.password}
-        />
+        <div className="space-y-2">
+          <Input
+            id="login-email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            aria-label="Correo electrónico"
+            aria-invalid={Boolean(state?.fieldErrors?.email)}
+            aria-describedby={
+              state?.fieldErrors?.email ? "login-email-error" : undefined
+            }
+            placeholder="tu@correo.com"
+            className="bg-surface-2"
+          />
+          {state?.fieldErrors?.email ? (
+            <p id="login-email-error" role="alert" className="text-sm text-destructive">
+              {state.fieldErrors.email}
+            </p>
+          ) : null}
+        </div>
+        <div className="space-y-2">
+          <Input
+            id="login-password"
+            name="password"
+            type="password"
+            autoComplete="current-password"
+            aria-label="Contraseña"
+            aria-invalid={Boolean(state?.fieldErrors?.password)}
+            aria-describedby={
+              state?.fieldErrors?.password ? "login-password-error" : undefined
+            }
+            placeholder="••••••••"
+            className="bg-surface-2"
+          />
+          {state?.fieldErrors?.password ? (
+            <p id="login-password-error" role="alert" className="text-sm text-destructive">
+              {state.fieldErrors.password}
+            </p>
+          ) : null}
+        </div>
         <Button
           type="submit"
           className="w-full"

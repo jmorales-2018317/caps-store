@@ -42,7 +42,7 @@ export function Categories() {
                 )}
 
                 {/* Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-bg/90 via-bg/20 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-bg/90 via-bg/20 to-transparent" />
 
                 {/* Content */}
                 <div className="absolute bottom-0 left-0 right-0 p-5">
