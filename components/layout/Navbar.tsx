@@ -122,7 +122,7 @@ export function Navbar() {
               </Link>
 
               <Link
-                href="/cart"
+                href="/cart?tab=cart"
                 className={cn(
                   "relative flex items-center justify-center w-9 h-9 text-muted hover:text-text transition-colors duration-200",
                   cartBump && "animate-pop"

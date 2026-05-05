@@ -36,11 +36,13 @@ function CartPageInner() {
   }, [tabParam]);
 
   const setActiveTab = useCallback(
-    (next: "cart" | "orders") => {
+    (next: "orders" | "cart") => {
       setActiveTabState(next);
-      router.replace(next === "orders" ? "/cart?tab=orders" : "/cart", {
-        scroll: false,
-      });
+      if (next === "orders") {
+        router.replace("/cart?tab=orders", { scroll: false });
+      } else {
+        router.replace("/cart?tab=cart", { scroll: false });
+      }
     },
     [router]
   );
