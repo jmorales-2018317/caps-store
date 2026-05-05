@@ -100,6 +100,8 @@ export interface Order {
   shipping_cost: number;
   total: number;
   status: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
+  /** Set for orders placed while logged in (Supabase `orders.user_id`). */
+  user_id?: string | null;
 }
 
 export interface OrderItem {
@@ -112,6 +114,11 @@ export interface OrderItem {
   size?: string;
   quantity: number;
   unit_price: number;
+}
+
+/** Pedido del cliente con líneas cargadas desde `order_items`. */
+export interface OrderWithItems extends Order {
+  items: OrderItem[];
 }
 
 export interface CartSession {

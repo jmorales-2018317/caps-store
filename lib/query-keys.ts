@@ -16,6 +16,7 @@ export const queryKeys = {
   },
   orders: {
     all: () => ["orders"] as const,
+    mine: () => ["orders", "mine"] as const,
   },
   profiles: {
     all: () => ["profiles"] as const,

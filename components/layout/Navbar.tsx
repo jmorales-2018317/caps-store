@@ -11,6 +11,7 @@ import {
   LogOut,
   LayoutDashboard,
   ChevronDown,
+  Package,
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { cn } from "@/lib/utils";
@@ -136,6 +137,15 @@ export function Navbar() {
                 )}
               </Link>
 
+              <Link
+                href="/cart?tab=orders"
+                className="hidden sm:flex items-center justify-center w-9 h-9 text-muted hover:text-text transition-colors duration-200"
+                aria-label="Mis pedidos"
+                title="Mis pedidos"
+              >
+                <Package className="w-5 h-5" />
+              </Link>
+
               {!user ? (
                 <Link
                   href="/login"
@@ -233,6 +243,12 @@ export function Navbar() {
                 {link.label}
               </Link>
             ))}
+            <Link
+              href="/cart?tab=orders"
+              className="text-sm font-bold uppercase tracking-[0.2em] text-muted hover:text-text transition-colors duration-200"
+            >
+              Pedidos
+            </Link>
             {!user ? (
               <Link
                 href="/login"

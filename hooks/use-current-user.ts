@@ -18,13 +18,14 @@ const useCurrentUser = (options?: Options) => {
   useEffect(() => {
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
+    } =     supabase.auth.onAuthStateChange(() => {
       void queryClient.invalidateQueries({
         queryKey: queryKeys.auth.user(),
       });
       void queryClient.invalidateQueries({
         queryKey: queryKeys.profiles.current(),
       });
+      void queryClient.invalidateQueries({ queryKey: ["cart"] });
     });
 
     return () => subscription.unsubscribe();

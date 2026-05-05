@@ -34,34 +34,11 @@ import { DataTableViewOptions } from "./data-table-view-options";
 import { DataTableBulkDelete } from "./data-table-bulk-delete";
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
 import { EditOrderDialog } from "./edit-order-sheet";
-
-type OrderStatus = Order["status"];
-
-const STATUS_CONFIG: Record<
-  OrderStatus,
-  { label: string; className: string }
-> = {
-  pending: {
-    label: "Pendiente",
-    className: "bg-yellow-500/15 text-yellow-400 border-yellow-500/30",
-  },
-  confirmed: {
-    label: "Confirmado",
-    className: "bg-blue-500/15 text-blue-400 border-blue-500/30",
-  },
-  shipped: {
-    label: "Enviado",
-    className: "bg-purple-500/15 text-purple-400 border-purple-500/30",
-  },
-  delivered: {
-    label: "Entregado",
-    className: "bg-green-500/15 text-green-400 border-green-500/30",
-  },
-  cancelled: {
-    label: "Cancelado",
-    className: "bg-red-500/15 text-red-400 border-red-500/30",
-  },
-};
+import {
+  OrderStatusBadge,
+  ORDER_STATUS_FILTER_OPTIONS,
+  type OrderStatus,
+} from "@/components/orders/order-status-badge";
 
 function createColumns(
   onEdit: (o: Order) => void,
@@ -143,20 +120,9 @@ function createColumns(
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Estado" />
       ),
-      cell: ({ row }) => {
-        const status = row.getValue<OrderStatus>("status");
-        const cfg = STATUS_CONFIG[status] ?? {
-          label: status,
-          className: "bg-surface-2 text-muted border-border",
-        };
-        return (
-          <span
-            className={`inline-block rounded border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${cfg.className}`}
-          >
-            {cfg.label}
-          </span>
-        );
-      },
+      cell: ({ row }) => (
+        <OrderStatusBadge status={row.getValue<OrderStatus>("status")} />
+      ),
       filterFn: (row, _id, value) =>
         value === "" || row.original.status === value,
     },
@@ -207,14 +173,6 @@ function createColumns(
     },
   ];
 }
-
-const ALL_STATUSES: { value: OrderStatus; label: string }[] = [
-  { value: "pending", label: "Pendiente" },
-  { value: "confirmed", label: "Confirmado" },
-  { value: "shipped", label: "Enviado" },
-  { value: "delivered", label: "Entregado" },
-  { value: "cancelled", label: "Cancelado" },
-];
 
 export function OrdersDataTable() {
   const { data = [], isLoading } = useOrders();
@@ -309,7 +267,7 @@ export function OrdersDataTable() {
           className="h-8 rounded border border-border bg-surface px-2 text-sm text-text focus:outline-none focus:border-accent"
         >
           <option value="">Todos los estados</option>
-          {ALL_STATUSES.map((s) => (
+          {ORDER_STATUS_FILTER_OPTIONS.map((s) => (
             <option key={s.value} value={s.value}>
               {s.label}
             </option>

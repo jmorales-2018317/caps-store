@@ -68,7 +68,7 @@ export function Hero() {
               ))}
             </div>
 
-            <div className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-4 border-t border-border/60 pt-10">
+            <div className="max-md:hidden mt-12 flex flex-wrap items-center gap-x-8 gap-y-4 border-t border-border/60 pt-10">
               <Link
                 href="/products"
                 className="group inline-flex items-center gap-2 text-sm font-medium text-text transition-colors hover:text-accent"
@@ -80,7 +80,7 @@ export function Hero() {
           </div>
 
           {/* Slider: centrado en la columna */}
-          <div className="relative z-0 flex w-full min-w-0 items-center justify-center self-stretch pt-4 lg:pt-0">
+          <div className="relative z-0 flex w-full min-w-0 items-center justify-center self-stretch md:pt-4 lg:pt-0">
             <HeroImageSlider slides={heroSliderImages} />
           </div>
         </div>

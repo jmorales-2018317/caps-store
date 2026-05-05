@@ -1,6 +1,13 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -29,6 +36,7 @@ import {
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useCurrentProfile } from "@/hooks/use-current-profile";
 import type { Profile } from "@/types";
+import { queryKeys } from "@/lib/query-keys";
 
 type Step = "shipping" | "account" | "confirm";
 
@@ -61,6 +69,7 @@ function contactFromUserAndProfile(
 
 function CheckoutFlow() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const { items, cartTotal, clearCart, isLoading: cartLoading } = useCart();
   const { data: user, isPending: userLoading } = useCurrentUser();
@@ -210,6 +219,7 @@ function CheckoutFlow() {
     }
 
     clearCart();
+    void queryClient.invalidateQueries({ queryKey: queryKeys.orders.mine() });
     setPlacedOrderId(result.orderId);
     setSubmitting(false);
   }

@@ -35,6 +35,16 @@ export async function createOrder(
   }
 
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return {
+      orderId: "",
+      error: "Tu sesión expiró o no estás identificado. Vuelve a iniciar sesión y prueba de nuevo.",
+    };
+  }
 
   const isPickup = formData.fulfillment === "pickup";
   const addressLine = isPickup
@@ -44,6 +54,7 @@ export async function createOrder(
   const { data: order, error: orderError } = await supabase
     .from("orders")
     .insert({
+      user_id: user.id,
       contact_name: `${formData.firstName} ${formData.lastName}`.trim(),
       contact_email: formData.email,
       contact_phone: formData.phone || null,

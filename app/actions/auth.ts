@@ -123,9 +123,9 @@ export async function googleOAuthAction(formData: FormData) {
   });
 
   if (error) {
-    redirect(
-      `/login?error=${encodeURIComponent(error.message)}`
-    );
+    const extra =
+      next != null ? `&redirect=${encodeURIComponent(next)}` : "";
+    redirect(`/login?error=${encodeURIComponent(error.message)}${extra}`);
   }
 
   if (data.url) {
