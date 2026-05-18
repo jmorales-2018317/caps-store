@@ -12,8 +12,10 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import Link from "next/link";
 import { Pencil, Trash2 } from "lucide-react";
 import type { Discount } from "@/types";
+import { dashboardRoutes } from "@/lib/dashboard-routes";
 import { useDiscounts } from "@/hooks/use-discounts";
 import { useDeleteDiscount } from "@/hooks/mutations/use-delete-discount";
 import { formatPrice } from "@/lib/utils";
@@ -33,7 +35,6 @@ import { DataTablePagination } from "./data-table-pagination";
 import { DataTableViewOptions } from "./data-table-view-options";
 import { DataTableBulkDelete } from "./data-table-bulk-delete";
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
-import { EditDiscountDialog } from "./edit-discount-sheet";
 
 function formatValueCell(d: Discount): string {
   if (d.type === "percentage") {
@@ -42,22 +43,11 @@ function formatValueCell(d: Discount): string {
   return formatPrice(d.value);
 }
 
-function formatPeriod(start: string, end: string): string {
-  const fmt = new Intl.DateTimeFormat("es-GT", {
-    dateStyle: "short",
-    timeStyle: "short",
-  });
-  return `${fmt.format(new Date(start))} – ${fmt.format(new Date(end))}`;
-}
-
 function typeLabel(t: Discount["type"]): string {
   return t === "percentage" ? "Porcentaje" : "Fijo (GTQ)";
 }
 
-function createColumns(
-  onEdit: (d: Discount) => void,
-  onDelete: (d: Discount) => void
-): ColumnDef<Discount>[] {
+function createColumns(onDelete: (d: Discount) => void): ColumnDef<Discount>[] {
   return [
     {
       id: "select",
@@ -87,7 +77,12 @@ function createColumns(
         <DataTableColumnHeader column={column} title="Nombre" />
       ),
       cell: ({ row }) => (
-        <span className="font-medium text-text">{row.getValue("name")}</span>
+        <Link
+          href={dashboardRoutes.descuentos.detail(row.original.id)}
+          className="font-medium text-text hover:text-accent"
+        >
+          {row.getValue("name")}
+        </Link>
       ),
     },
     {
@@ -144,40 +139,14 @@ function createColumns(
       enableSorting: true,
     },
     {
-      id: "products",
-      accessorFn: (row) =>
-        (row.products ?? []).map((p) => p.name).join(", ") || "—",
-      header: () => (
-        <div className="text-[11px] font-bold uppercase tracking-widest text-muted">
-          Productos
-        </div>
-      ),
-      cell: ({ row }) => {
-        const list = row.original.products ?? [];
-        if (list.length === 0) {
-          return <span className="text-muted">—</span>;
-        }
-        const text = list.map((p) => p.name).join(", ");
-        return (
-          <span className="max-w-xs truncate text-sm text-muted" title={text}>
-            {text}
-          </span>
-        );
-      },
-      enableSorting: false,
-    },
-    {
       id: "actions",
       header: () => null,
       cell: ({ row }) => (
         <div className="flex items-center justify-end gap-1">
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={() => onEdit(row.original)}
-            title="Editar"
-          >
-            <Pencil />
+          <Button variant="ghost" size="icon-sm" asChild title="Editar">
+            <Link href={dashboardRoutes.descuentos.editar(row.original.id)}>
+              <Pencil />
+            </Link>
           </Button>
           <Button
             variant="ghost"
@@ -206,12 +175,11 @@ export function DiscountsDataTable() {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-  const [editing, setEditing] = React.useState<Discount | null>(null);
   const [deleting, setDeleting] = React.useState<Discount | null>(null);
   const [error, setError] = React.useState<string | null>(null);
 
   const columns = React.useMemo(
-    () => createColumns(setEditing, setDeleting),
+    () => createColumns(setDeleting),
     []
   );
 
@@ -326,18 +294,10 @@ export function DiscountsDataTable() {
 
       <DataTablePagination table={table} />
 
-      {editing && (
-        <EditDiscountDialog
-          discount={editing}
-          open={!!editing}
-          onOpenChange={(open) => !open && setEditing(null)}
-        />
-      )}
-
       <DeleteConfirmDialog
         open={!!deleting}
         onOpenChange={(open) => !open && setDeleting(null)}
-        title={`¿Eliminar "${deleting?.name}"?`}
+        title={`¿Eliminar Descuento?`}
         description="Se eliminará el descuento y su vínculo con productos."
         isPending={deleteDiscount.isPending}
         onConfirm={handleDelete}

@@ -6,9 +6,11 @@ import { getProducts } from "@/services/products";
 import { getStyles } from "@/services/styles";
 import { getCategories } from "@/services/categories";
 import { getDiscounts } from "@/services/discounts";
-import { CreateProductAction } from "@/components/dashboard/create-product-dialog";
+import Link from "next/link";
 import { EntityHeader } from "@/components/dashboard/entity-header";
 import { ProductsDataTable } from "@/components/dashboard/products-data-table";
+import { Button } from "@/components/ui/button";
+import { dashboardRoutes } from "@/lib/dashboard-routes";
 
 export default async function DashboardProductosPage() {
   const supabase = await createClient();
@@ -40,7 +42,11 @@ export default async function DashboardProductosPage() {
           badge="Entidades"
           title="Productos"
           description="Gestion de productos del catalogo con datos reales desde Supabase."
-          action={<CreateProductAction />}
+          action={
+            <Button asChild>
+              <Link href={dashboardRoutes.productos.crear()}>Crear producto</Link>
+            </Button>
+          }
         />
         <ProductsDataTable />
       </div>

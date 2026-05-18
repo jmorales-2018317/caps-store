@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { normalizeOrderStatus } from "@/lib/order-status";
 import type { Order, OrderItem, OrderWithItems } from "@/types";
 
 type OrderRow = Omit<Order, "contact_phone" | "address" | "city" | "state"> & {
@@ -11,6 +12,7 @@ type OrderRow = Omit<Order, "contact_phone" | "address" | "city" | "state"> & {
 function mapOrderRow(row: OrderRow): Order {
   return {
     ...row,
+    status: normalizeOrderStatus(row.status),
     contact_phone: row.contact_phone ?? undefined,
     address: row.address ?? undefined,
     city: row.city ?? undefined,
@@ -40,6 +42,34 @@ export async function getOrders(supabase: SupabaseClient): Promise<Order[]> {
 
   if (error) throw new Error(error.message);
   return ((data ?? []) as OrderRow[]).map(mapOrderRow);
+}
+
+export async function getOrderById(
+  supabase: SupabaseClient,
+  id: string
+): Promise<OrderWithItems | null> {
+  const { data: orderRow, error: orderError } = await supabase
+    .from("orders")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (orderError || !orderRow) return null;
+
+  const order = mapOrderRow(orderRow as OrderRow);
+
+  const { data: itemRows, error: itemsError } = await supabase
+    .from("order_items")
+    .select("*")
+    .eq("order_id", id);
+
+  if (itemsError) throw new Error(itemsError.message);
+
+  const items = (itemRows ?? []).map((raw) =>
+    mapOrderItemRow(raw as Record<string, unknown>)
+  );
+
+  return { ...order, items };
 }
 
 export async function getMyOrders(supabase: SupabaseClient): Promise<OrderWithItems[]> {

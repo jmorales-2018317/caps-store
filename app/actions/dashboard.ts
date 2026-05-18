@@ -12,6 +12,7 @@ import {
   type HatStyleRow,
   type ProductRow,
 } from "@/lib/supabase/mappers";
+import { normalizeOrderStatus } from "@/lib/order-status";
 import type {
   Category,
   Discount,
@@ -503,6 +504,7 @@ type OrderRow = Omit<Order, "contact_phone" | "address" | "city" | "state"> & {
 function mapOrderRow(row: OrderRow): Order {
   return {
     ...row,
+    status: normalizeOrderStatus(row.status),
     contact_phone: row.contact_phone ?? undefined,
     address: row.address ?? undefined,
     city: row.city ?? undefined,
@@ -546,6 +548,28 @@ export async function updateOrder(input: {
         address: input.address,
       })
       .eq("id", input.id);
+
+    if (error) return { error: error.message };
+    return {};
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Error inesperado" };
+  }
+}
+
+export async function updateOrdersStatus(input: {
+  ids: string[];
+  status: Order["status"];
+}): Promise<MutationResult> {
+  if (input.ids.length === 0) {
+    return { error: "No hay ordenes seleccionadas." };
+  }
+
+  try {
+    const { supabase } = await requireUser();
+    const { error } = await supabase
+      .from("orders")
+      .update({ status: input.status })
+      .in("id", input.ids);
 
     if (error) return { error: error.message };
     return {};

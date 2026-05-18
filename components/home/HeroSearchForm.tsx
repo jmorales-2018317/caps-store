@@ -42,13 +42,12 @@ export function HeroSearchForm({ className }: HeroSearchFormProps) {
           />
           <input
             id="hero-search"
-            type="search"
             name="q"
             value={value}
             onChange={(e) => setValue(e.target.value)}
             placeholder="Nombre, estilo, color…"
             autoComplete="off"
-            className="min-w-0 flex-1 appearance-none bg-transparent py-3.5 text-[15px] text-text placeholder:text-muted/70 focus:outline-none focus-visible:outline-none"
+            className="min-w-0 flex-1 appearance-none bg-transparent py-3.5 text-[15px] mr-2.5 text-text placeholder:text-muted/70 focus:outline-none focus-visible:outline-none"
           />
         </div>
         <button

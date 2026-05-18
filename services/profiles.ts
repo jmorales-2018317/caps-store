@@ -31,6 +31,20 @@ export async function getProfiles(
   return ((data ?? []) as ProfileRow[]).map(mapProfileRow);
 }
 
+export async function getProfileById(
+  supabase: SupabaseClient,
+  id: string
+): Promise<Profile | null> {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return mapProfileRow(data as ProfileRow);
+}
+
 export async function getCurrentProfile(
   supabase: SupabaseClient
 ): Promise<Profile | null> {

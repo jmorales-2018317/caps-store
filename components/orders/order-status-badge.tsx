@@ -1,7 +1,8 @@
-import type { Order } from "@/types";
 import { cn } from "@/lib/utils";
+import { ORDER_STATUSES, type OrderStatus } from "@/lib/order-status";
 
-export type OrderStatus = Order["status"];
+export type { OrderStatus } from "@/lib/order-status";
+export { normalizeOrderStatus } from "@/lib/order-status";
 
 export const ORDER_STATUS_BADGE_CONFIG: Record<
   OrderStatus,
@@ -10,10 +11,6 @@ export const ORDER_STATUS_BADGE_CONFIG: Record<
   pending: {
     label: "Pendiente",
     className: "bg-yellow-500/15 text-yellow-400 border-yellow-500/30",
-  },
-  confirmed: {
-    label: "Confirmado",
-    className: "bg-blue-500/15 text-blue-400 border-blue-500/30",
   },
   shipped: {
     label: "Enviado",
@@ -29,19 +26,11 @@ export const ORDER_STATUS_BADGE_CONFIG: Record<
   },
 };
 
-const STATUS_ORDER: OrderStatus[] = [
-  "pending",
-  "confirmed",
-  "shipped",
-  "delivered",
-  "cancelled",
-];
-
 /** Opciones para filtros / selects (orden fijo). */
 export const ORDER_STATUS_FILTER_OPTIONS: {
   value: OrderStatus;
   label: string;
-}[] = STATUS_ORDER.map((value) => ({
+}[] = ORDER_STATUSES.map((value) => ({
   value,
   label: ORDER_STATUS_BADGE_CONFIG[value].label,
 }));

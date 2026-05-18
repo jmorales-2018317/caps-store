@@ -13,8 +13,10 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import Link from "next/link";
 import { Pencil, Trash2 } from "lucide-react";
 import type { Category } from "@/types";
+import { dashboardRoutes } from "@/lib/dashboard-routes";
 import { useCategories } from "@/hooks/use-categories";
 import { useDeleteCategory } from "@/hooks/mutations/use-delete-category";
 import { Button } from "@/components/ui/button";
@@ -33,13 +35,9 @@ import { DataTablePagination } from "./data-table-pagination";
 import { DataTableViewOptions } from "./data-table-view-options";
 import { DataTableBulkDelete } from "./data-table-bulk-delete";
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
-import { EditCategoryDialog } from "./edit-category-sheet";
 import Image from "next/image";
 
-function createColumns(
-  onEdit: (c: Category) => void,
-  onDelete: (c: Category) => void
-): ColumnDef<Category>[] {
+function createColumns(onDelete: (c: Category) => void): ColumnDef<Category>[] {
   return [
     {
       id: "select",
@@ -74,7 +72,10 @@ function createColumns(
       cell: ({ row }) => {
         const src = row.original.image;
         return src ? (
-          <div className="size-10 overflow-hidden rounded border border-border">
+          <Link
+            href={dashboardRoutes.categorias.detail(row.original.id)}
+            className="block size-10 overflow-hidden rounded border border-border"
+          >
             <Image
               src={src}
               alt={row.original.label}
@@ -82,7 +83,7 @@ function createColumns(
               height={40}
               className="size-full object-cover"
             />
-          </div>
+          </Link>
         ) : (
           <div className="size-10 rounded border border-border bg-surface-2 flex items-center justify-center text-muted text-xs">
             —
@@ -97,7 +98,12 @@ function createColumns(
         <DataTableColumnHeader column={column} title="Nombre" />
       ),
       cell: ({ row }) => (
-        <span className="font-medium text-text">{row.getValue("label")}</span>
+        <Link
+          href={dashboardRoutes.categorias.detail(row.original.id)}
+          className="font-medium text-text hover:text-accent"
+        >
+          {row.getValue("label")}
+        </Link>
       ),
     },
     {
@@ -122,13 +128,10 @@ function createColumns(
       header: () => null,
       cell: ({ row }) => (
         <div className="flex items-center justify-end gap-1">
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={() => onEdit(row.original)}
-            title="Editar"
-          >
-            <Pencil />
+          <Button variant="ghost" size="icon-sm" asChild title="Editar">
+            <Link href={dashboardRoutes.categorias.editar(row.original.id)}>
+              <Pencil />
+            </Link>
           </Button>
           <Button
             variant="ghost"
@@ -158,16 +161,11 @@ export function CategoriesDataTable() {
 
   const deleteCategory = useDeleteCategory();
 
-  const [editingCategory, setEditingCategory] =
-    React.useState<Category | null>(null);
   const [deletingCategory, setDeletingCategory] =
     React.useState<Category | null>(null);
   const [error, setError] = React.useState<string | null>(null);
 
-  const columns = React.useMemo(
-    () => createColumns(setEditingCategory, setDeletingCategory),
-    []
-  );
+  const columns = React.useMemo(() => createColumns(setDeletingCategory), []);
 
   const table = useReactTable({
     data,
@@ -285,18 +283,10 @@ export function CategoriesDataTable() {
 
       <DataTablePagination table={table} />
 
-      {editingCategory && (
-        <EditCategoryDialog
-          open={!!editingCategory}
-          onOpenChange={(open) => !open && setEditingCategory(null)}
-          category={editingCategory}
-        />
-      )}
-
       <DeleteConfirmDialog
         open={!!deletingCategory}
         onOpenChange={(open) => !open && setDeletingCategory(null)}
-        title={`¿Eliminar "${deletingCategory?.label}"?`}
+        title={`¿Eliminar Categoría?`}
         description="Se eliminará la categoría permanentemente."
         isPending={deleteCategory.isPending}
         onConfirm={handleDelete}

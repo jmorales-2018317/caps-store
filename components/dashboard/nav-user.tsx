@@ -6,10 +6,11 @@ import {
   Home,
   LogOut,
 } from "lucide-react"
-import { useState, useTransition } from "react"
+import { useTransition } from "react"
+import Link from "next/link"
 import { logoutAction } from "@/app/actions/auth"
 import { useCurrentProfile } from "@/hooks/use-current-profile"
-import { EditProfileDialog } from "./edit-profile-sheet"
+import { dashboardRoutes } from "@/lib/dashboard-routes"
 import { useRouter } from "next/navigation"
 import {
   Avatar,
@@ -44,7 +45,6 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
-  const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [, startTransition] = useTransition()
 
   const { data: profile } = useCurrentProfile()
@@ -102,13 +102,11 @@ export function NavUser({
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
-                <DropdownMenuItem
-                  onSelect={() => {
-                    setIsProfileOpen(true)
-                  }}
-                >
-                  <BadgeCheck />
-                  Account
+                <DropdownMenuItem asChild>
+                  <Link href={dashboardRoutes.perfiles.editar(profileData.id)}>
+                    <BadgeCheck />
+                    Account
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onSelect={handleGoToHome}
@@ -133,12 +131,6 @@ export function NavUser({
           </DropdownMenu>
         </SidebarMenuItem>
       </SidebarMenu>
-
-      <EditProfileDialog
-        open={isProfileOpen}
-        onOpenChange={setIsProfileOpen}
-        profile={profileData}
-      />
     </>
   )
 }

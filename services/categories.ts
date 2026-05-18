@@ -9,3 +9,17 @@ export async function getCategories(
   if (error) throw new Error(error.message);
   return ((data ?? []) as CategoryRow[]).map(mapCategoryRow);
 }
+
+export async function getCategoryById(
+  supabase: SupabaseClient,
+  id: string
+): Promise<Category | null> {
+  const { data, error } = await supabase
+    .from("categories")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return mapCategoryRow(data as CategoryRow);
+}

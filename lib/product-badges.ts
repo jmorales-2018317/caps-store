@@ -24,8 +24,5 @@ export function getProductCardBadges(product: Product): ProductCardBadge[] {
   if (isProductRecent(product)) {
     out.push({ key: "reciente", type: "reciente" });
   }
-  if (isProductOnSale(product)) {
-    out.push({ key: "oferta", type: "sale" });
-  }
   return out;
 }

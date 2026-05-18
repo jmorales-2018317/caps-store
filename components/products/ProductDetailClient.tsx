@@ -291,20 +291,6 @@ export function ProductDetailClient({ productId }: ProductDetailClientProps) {
               )}
             </Button>
           </div>
-
-          {/* Trust signals */}
-          <div className="border-t border-border pt-6 space-y-2.5">
-            {[
-              `Envío gratis en pedidos superiores a Q${FREE_SHIPPING_MINIMUM_GTQ}`,
-              "Devoluciones gratuitas en 30 días",
-              "Autenticidad garantizada",
-            ].map((item) => (
-              <div key={item} className="flex items-center gap-2.5">
-                <div className="w-1 h-1 rounded-full bg-accent shrink-0" />
-                <p className="text-[11px] text-muted">{item}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
 

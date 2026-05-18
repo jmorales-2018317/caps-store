@@ -8,12 +8,25 @@ import {
   useEffect,
   useState,
 } from "react";
-import { ShoppingBag, ArrowLeft, ArrowRight } from "lucide-react";
+import {
+  CreditCard,
+  MoveRight,
+  Shield,
+  ShoppingBag,
+  Store,
+} from "lucide-react";
 import { useCart } from "@/context/CartContext";
-import { AccountEmptyState, AccountPanelLoading } from "@/components/cart/AccountEmptyState";
+import { AccountPanelLoading } from "@/components/cart/AccountEmptyState";
 import { CartItem } from "@/components/cart/CartItem";
 import { MyOrdersPanel } from "@/components/cart/MyOrdersPanel";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import {
   cn,
   formatPrice,
@@ -49,144 +62,195 @@ function CartPageInner() {
 
   const { items, cartTotal, clearCart } = useCart();
 
+  const savings = items.reduce((sum, item) => {
+    const original = item.product.originalPrice;
+    if (original == null || original <= item.product.price) return sum;
+    return sum + (original - item.product.price) * item.quantity;
+  }, 0);
+
   const shipping =
     cartTotal >= FREE_SHIPPING_MINIMUM_GTQ ? 0 : SHIPPING_STANDARD_GTQ;
   const total = cartTotal + shipping;
 
   const cartTabBody =
     items.length === 0 ? (
-      <AccountEmptyState
-        icon={ShoppingBag}
-        eyebrow="Tu selección"
-        title="Tu carrito está vacío"
-        description="Explora la tienda, elige colores y talla, y vuelve aquí para finalizar tu pedido cuando quieras."
-        primaryAction={{ href: "/products", label: "Ver tienda" }}
-      />
+      <div className="flex flex-col gap-8 lg:flex-row">
+        <div className="flex-1">
+          <Card className="border-dashed border-border">
+            <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+              <ShoppingBag className="text-muted-foreground/50 mb-4 size-12" />
+              <h3 className="text-lg font-medium text-foreground">
+                Tu carrito está vacío
+              </h3>
+              <p className="text-muted-foreground mt-1 text-sm">
+                Explora la tienda y añade gorras a tu selección
+              </p>
+              <Button
+                className="mt-4 h-9 cursor-pointer px-4 py-2"
+                variant="outline"
+                asChild
+              >
+                <Link href="/products">Ver tienda</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     ) : (
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-        <div className="lg:col-span-2">
-          <div className="flex items-center justify-between pb-4 border-b border-border">
-            <span className="text-[11px] uppercase tracking-widest text-muted">
-              {items.length} {items.length === 1 ? "artículo" : "artículos"}
-            </span>
+      <div className="flex flex-col gap-8 lg:flex-row">
+        <div className="flex flex-1 flex-col gap-6">
+          <div className="flex items-center justify-end">
             <button
               type="button"
               onClick={clearCart}
-              className="text-[10px] uppercase tracking-widest text-muted hover:text-accent transition-colors font-bold"
+              className="text-muted-foreground hover:text-destructive cursor-pointer text-xs font-medium transition-colors"
             >
               Vaciar carrito
             </button>
           </div>
 
-          <div>
-            {items.map((item) => (
-              <CartItem
-                key={`${item.product.id}-${item.selectedColor.name}-${item.selectedSize}`}
-                item={item}
-              />
-            ))}
-          </div>
+          {items.map((item) => (
+            <CartItem
+              key={`${item.product.id}-${item.selectedColor.name}-${item.selectedSize}`}
+              item={item}
+            />
+          ))}
         </div>
 
-        <div className="lg:col-span-1">
-          <div className="bg-surface border border-border p-6 sticky top-24">
-            <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-text mb-6">
-              Resumen del pedido
-            </h2>
-
-            <div className="space-y-3 mb-6">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted">Subtotal</span>
-                <span className="text-sm font-bold text-text">
-                  {formatPrice(cartTotal)}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted">Envío</span>
-                <span className="text-sm font-bold text-text">
-                  {shipping === 0 ? (
-                    <span className="text-green-500">Gratis</span>
-                  ) : (
-                    formatPriceDecimal(shipping)
-                  )}
-                </span>
+        <div className="flex w-full flex-col gap-4 lg:w-96">
+          <Card className="sticky top-4 gap-0 border-border">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-xl">Resumen del pedido</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span>{formatPriceDecimal(cartTotal)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Envío</span>
+                  <span
+                    className={cn(shipping === 0 && "font-medium text-green-500")}
+                  >
+                    {shipping === 0 ? "Gratis" : formatPriceDecimal(shipping)}
+                  </span>
+                </div>
+                {savings > 0 && (
+                  <div className="flex justify-between text-sm font-medium">
+                    <span>Ahorras</span>
+                    <span className="text-green-500">
+                      -{formatPriceDecimal(savings)}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {shipping > 0 && (
-                <div className="text-[11px] text-muted bg-surface-2 px-3 py-2.5 border-l-2 border-accent">
+                <p className="text-muted-foreground border-accent border-l-2 bg-muted/30 px-3 py-2 text-xs">
                   Añade{" "}
-                  <span className="text-text font-bold">
+                  <span className="text-foreground font-semibold">
                     {formatPrice(FREE_SHIPPING_MINIMUM_GTQ - cartTotal)}
                   </span>{" "}
                   más para envío gratis
-                </div>
+                </p>
               )}
 
-              <div className="pt-4 border-t border-border flex items-center justify-between">
-                <span className="text-xs font-black uppercase tracking-widest text-text">
-                  Total
-                </span>
-                <span className="text-xl font-black text-text">
-                  {formatPriceDecimal(total)}
-                </span>
-              </div>
-            </div>
+              <Separator className="my-2" />
 
-            <Button size="lg" className="w-full" asChild>
-              <Link href="/checkout">
-                Ir al pago
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </Button>
-
-            <div className="mt-5 pt-5 border-t border-border">
-              <p className="text-[10px] uppercase tracking-widest text-muted text-center mb-3">
-                Pago seguro
-              </p>
-              <div className="flex items-center justify-center gap-3 text-[10px] font-bold uppercase tracking-widest text-faint">
-                <span>Visa</span>
-                <span>·</span>
-                <span>Mastercard</span>
-                <span>·</span>
-                <span>Amex</span>
-                <span>·</span>
-                <span>PayPal</span>
+              <div className="flex items-center justify-between text-base font-medium">
+                <span>Total</span>
+                <div className="text-end">
+                  <p className="text-xl font-bold">{formatPriceDecimal(total)}</p>
+                  <p className="text-muted-foreground text-xs">
+                    impuestos incluidos, si aplican
+                  </p>
+                </div>
               </div>
-            </div>
-          </div>
+
+              <Button
+                size="lg"
+                className="mt-4 h-10 w-full cursor-pointer px-8 text-base font-medium"
+                asChild
+              >
+                <Link href="/checkout">
+                  <ShoppingBag />
+                  Ir al pago
+                </Link>
+              </Button>
+
+              <div className="text-muted-foreground flex items-center justify-center gap-2 text-xs">
+                <CreditCard className="size-3.5 shrink-0" />
+                <span>Pago seguro con cifrado SSL</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-dashed border-border py-4">
+            <CardContent className="px-4">
+              <div className="flex items-start gap-3">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-amber-100/10 text-amber-500">
+                  <Shield className="size-5" />
+                </div>
+                <div>
+                  <h4 className="font-medium text-foreground">Pago seguro</h4>
+                  <p className="text-muted-foreground mt-1 text-xs">
+                    Tu información de pago está cifrada y protegida.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Button
+            variant="outline"
+            className="h-9 w-full cursor-pointer px-4 py-2"
+            asChild
+          >
+            <Link href="/products">
+              <Store />
+              Seguir comprando
+              <MoveRight />
+            </Link>
+          </Button>
         </div>
       </div>
     );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-10">
-        <div>
-          <p className="text-[11px] font-black uppercase tracking-[0.3em] text-accent mb-1">
-            Tu cuenta
+    <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mb-8 flex flex-col gap-2 text-center">
+        <p className="text-accent text-[11px] font-black uppercase tracking-[0.3em]">
+          Tu cuenta
+        </p>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+          Carrito y pedidos
+        </h1>
+        {activeTab === "cart" && items.length > 0 && (
+          <p className="text-muted-foreground">
+            {items.length} {items.length === 1 ? "artículo" : "artículos"} en tu
+            carrito •{" "}
+            <span className="text-foreground font-semibold">
+              {formatPrice(cartTotal)}
+            </span>
           </p>
-          <h1 className="font-black uppercase text-4xl sm:text-5xl tracking-tighter text-text leading-none">
-            Carrito y pedidos
-          </h1>
-        </div>
-        <Link
-          href="/products"
-          className="hidden sm:flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-muted hover:text-text transition-colors self-start sm:self-auto"
-        >
-          <ArrowLeft className="w-3 h-3" />
-          Seguir comprando
-        </Link>
+        )}
+        {activeTab === "cart" && items.length === 0 && (
+          <p className="text-muted-foreground text-sm">
+            Revisa tus artículos antes de pagar
+          </p>
+        )}
       </div>
 
-      <div className="flex gap-1 border-b border-border mb-10 max-w-md">
+      <div className="mb-8 flex max-w-md gap-1 border-b border-border mx-auto">
         <button
           type="button"
           onClick={() => setActiveTab("cart")}
           className={cn(
-            "flex-1 py-3 text-[11px] font-black uppercase tracking-[0.2em] transition-colors border-b-2 -mb-px",
+            "flex-1 cursor-pointer border-b-2 py-3 text-sm font-semibold transition-colors -mb-px",
             activeTab === "cart"
-              ? "border-accent text-text"
-              : "border-transparent text-muted hover:text-text"
+              ? "border-accent text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
           )}
         >
           Carrito
@@ -195,10 +259,10 @@ function CartPageInner() {
           type="button"
           onClick={() => setActiveTab("orders")}
           className={cn(
-            "flex-1 py-3 text-[11px] font-black uppercase tracking-[0.2em] transition-colors border-b-2 -mb-px",
+            "flex-1 cursor-pointer border-b-2 py-3 text-sm font-semibold transition-colors -mb-px",
             activeTab === "orders"
-              ? "border-accent text-text"
-              : "border-transparent text-muted hover:text-text"
+              ? "border-accent text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
           )}
         >
           Mis pedidos
@@ -214,7 +278,7 @@ export default function CartPage() {
   return (
     <Suspense
       fallback={
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
           <AccountPanelLoading label="Cargando…" />
         </div>
       }

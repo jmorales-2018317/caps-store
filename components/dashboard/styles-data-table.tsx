@@ -13,8 +13,10 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import Link from "next/link";
 import { Pencil, Trash2 } from "lucide-react";
 import type { HatStyle } from "@/types";
+import { dashboardRoutes } from "@/lib/dashboard-routes";
 import { useStyles } from "@/hooks/use-styles";
 import { useDeleteStyle } from "@/hooks/mutations/use-delete-style";
 import { Button } from "@/components/ui/button";
@@ -33,12 +35,8 @@ import { DataTablePagination } from "./data-table-pagination";
 import { DataTableViewOptions } from "./data-table-view-options";
 import { DataTableBulkDelete } from "./data-table-bulk-delete";
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
-import { EditStyleDialog } from "./edit-style-sheet";
 
-function createColumns(
-  onEdit: (s: HatStyle) => void,
-  onDelete: (s: HatStyle) => void
-): ColumnDef<HatStyle>[] {
+function createColumns(onDelete: (s: HatStyle) => void): ColumnDef<HatStyle>[] {
   return [
     {
       id: "select",
@@ -73,14 +71,17 @@ function createColumns(
       cell: ({ row }) => {
         const src = row.original.image;
         return src ? (
-          <div className="size-10 overflow-hidden rounded border border-border">
+          <Link
+            href={dashboardRoutes.estilos.detail(row.original.id)}
+            className="block size-10 overflow-hidden rounded border border-border"
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={src}
               alt={row.original.label}
               className="size-full object-cover"
             />
-          </div>
+          </Link>
         ) : (
           <div className="size-10 rounded border border-border bg-surface-2 flex items-center justify-center text-muted text-xs">
             —
@@ -95,7 +96,12 @@ function createColumns(
         <DataTableColumnHeader column={column} title="Nombre" />
       ),
       cell: ({ row }) => (
-        <span className="font-medium text-text">{row.getValue("label")}</span>
+        <Link
+          href={dashboardRoutes.estilos.detail(row.original.id)}
+          className="font-medium text-text hover:text-accent"
+        >
+          {row.getValue("label")}
+        </Link>
       ),
     },
     {
@@ -117,13 +123,10 @@ function createColumns(
       header: () => null,
       cell: ({ row }) => (
         <div className="flex items-center justify-end gap-1">
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={() => onEdit(row.original)}
-            title="Editar"
-          >
-            <Pencil />
+          <Button variant="ghost" size="icon-sm" asChild title="Editar">
+            <Link href={dashboardRoutes.estilos.editar(row.original.id)}>
+              <Pencil />
+            </Link>
           </Button>
           <Button
             variant="ghost"
@@ -152,12 +155,11 @@ export function StylesDataTable() {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-  const [editingStyle, setEditingStyle] = React.useState<HatStyle | null>(null);
   const [deletingStyle, setDeletingStyle] = React.useState<HatStyle | null>(null);
   const [error, setError] = React.useState<string | null>(null);
 
   const columns = React.useMemo(
-    () => createColumns(setEditingStyle, setDeletingStyle),
+    () => createColumns(setDeletingStyle),
     []
   );
 
@@ -276,18 +278,10 @@ export function StylesDataTable() {
 
       <DataTablePagination table={table} />
 
-      {editingStyle && (
-        <EditStyleDialog
-          open={!!editingStyle}
-          onOpenChange={(open) => !open && setEditingStyle(null)}
-          style={editingStyle}
-        />
-      )}
-
       <DeleteConfirmDialog
         open={!!deletingStyle}
         onOpenChange={(open) => !open && setDeletingStyle(null)}
-        title={`¿Eliminar "${deletingStyle?.label}"?`}
+        title={`¿Eliminar Estilo?`}
         description="Se eliminará el estilo permanentemente."
         isPending={deleteStyle.isPending}
         onConfirm={handleDelete}

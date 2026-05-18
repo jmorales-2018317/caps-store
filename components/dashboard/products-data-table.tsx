@@ -13,20 +13,15 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Images, Pencil, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { Pencil, Trash2 } from "lucide-react";
 import type { Product } from "@/types";
+import { dashboardRoutes } from "@/lib/dashboard-routes";
 import { useProducts } from "@/hooks/use-products";
 import { useDeleteProduct } from "@/hooks/mutations/use-delete-product";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import Image from "next/image";
 import {
   Table,
@@ -41,13 +36,8 @@ import { DataTablePagination } from "./data-table-pagination";
 import { DataTableViewOptions } from "./data-table-view-options";
 import { DataTableBulkDelete } from "./data-table-bulk-delete";
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
-import { EditProductDialog } from "./edit-product-sheet";
 
-function createColumns(
-  onEdit: (p: Product) => void,
-  onDelete: (p: Product) => void,
-  onShowImages: (p: Product) => void
-): ColumnDef<Product>[] {
+function createColumns(onDelete: (p: Product) => void): ColumnDef<Product>[] {
   return [
     {
       id: "select",
@@ -93,11 +83,10 @@ function createColumns(
         }
 
         return (
-          <button
-            type="button"
-            onClick={() => onShowImages(row.original)}
+          <Link
+            href={dashboardRoutes.productos.detail(row.original.id)}
             className="group flex items-center gap-1"
-            title="Ver galeria"
+            title="Ver detalle"
           >
             <div className="size-10 z-1 overflow-hidden rounded border border-border">
               <Image src={cover} alt={row.original.name} width={40} height={40} className="size-full object-cover" />
@@ -107,7 +96,7 @@ function createColumns(
                 +{extra}
               </div>
             )}
-          </button>
+          </Link>
         );
       },
       enableSorting: false,
@@ -118,7 +107,12 @@ function createColumns(
         <DataTableColumnHeader column={column} title="Nombre" />
       ),
       cell: ({ row }) => (
-        <span className="font-medium text-text">{row.getValue("name")}</span>
+        <Link
+          href={dashboardRoutes.productos.detail(row.original.id)}
+          className="font-medium text-text hover:text-accent"
+        >
+          {row.getValue("name")}
+        </Link>
       ),
     },
     {
@@ -231,13 +225,10 @@ function createColumns(
       header: () => null,
       cell: ({ row }) => (
         <div className="flex items-center justify-end gap-1">
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={() => onEdit(row.original)}
-            title="Editar"
-          >
-            <Pencil />
+          <Button variant="ghost" size="icon-sm" asChild title="Editar">
+            <Link href={dashboardRoutes.productos.editar(row.original.id)}>
+              <Pencil />
+            </Link>
           </Button>
           <Button
             variant="ghost"
@@ -265,15 +256,10 @@ export function ProductsDataTable() {
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-  const [editingProduct, setEditingProduct] = React.useState<Product | null>(null);
   const [deletingProduct, setDeletingProduct] = React.useState<Product | null>(null);
-  const [galleryProduct, setGalleryProduct] = React.useState<Product | null>(null);
   const [error, setError] = React.useState<string | null>(null);
 
-  const columns = React.useMemo(
-    () => createColumns(setEditingProduct, setDeletingProduct, setGalleryProduct),
-    []
-  );
+  const columns = React.useMemo(() => createColumns(setDeletingProduct), []);
 
   const table = useReactTable({
     data,
@@ -375,50 +361,15 @@ export function ProductsDataTable() {
 
       <DataTablePagination table={table} />
 
-      {editingProduct ? (
-        <EditProductDialog
-          open={!!editingProduct}
-          onOpenChange={(open) => !open && setEditingProduct(null)}
-          product={editingProduct}
-        />
-      ) : null}
-
       <DeleteConfirmDialog
         open={!!deletingProduct}
         onOpenChange={(open) => !open && setDeletingProduct(null)}
-        title={`¿Eliminar "${deletingProduct?.name}"?`}
+        title={`¿Eliminar Producto?`}
         description="Se eliminará el producto permanentemente."
         isPending={deleteProduct.isPending}
         onConfirm={handleDelete}
       />
 
-      <Dialog open={!!galleryProduct} onOpenChange={(open) => !open && setGalleryProduct(null)}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Images className="size-4" />
-              Imagenes de {galleryProduct?.name}
-            </DialogTitle>
-            <DialogDescription>
-              Portada primero y resto de imagenes del producto.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="grid max-h-[60vh] grid-cols-2 gap-3 overflow-y-auto pr-1 sm:grid-cols-3">
-            {(galleryProduct?.images ?? []).map((src, index) => (
-              <div key={`${src}-${index}`} className="space-y-1">
-                <div className="aspect-square overflow-hidden rounded border border-border bg-surface-2">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={src} alt={`Imagen ${index + 1}`} className="size-full object-cover" />
-                </div>
-                <p className="text-xs text-muted">
-                  {index === 0 ? "Portada" : `Imagen ${index + 1}`}
-                </p>
-              </div>
-            ))}
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

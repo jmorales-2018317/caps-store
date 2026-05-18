@@ -35,7 +35,7 @@ export interface ProductDiscountRef {
   name: string;
 }
 
-export type Badge = "new" | "sale" | "limited" | "bestseller" | "reciente";
+export type Badge = "new" | "limited" | "bestseller" | "reciente";
 
 export interface ProductColor {
   name: string;
@@ -99,7 +99,7 @@ export interface Order {
   subtotal: number;
   shipping_cost: number;
   total: number;
-  status: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
+  status: "pending" | "shipped" | "delivered" | "cancelled";
   /** Set for orders placed while logged in (Supabase `orders.user_id`). */
   user_id?: string | null;
 }

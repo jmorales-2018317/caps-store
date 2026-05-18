@@ -3,7 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 import { getQueryClient } from "@/lib/get-query-client";
 import { queryKeys } from "@/lib/query-keys";
 import { getStyles } from "@/services/styles";
-import { CreateStyleAction } from "@/components/dashboard/create-style-dialog";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { dashboardRoutes } from "@/lib/dashboard-routes";
 import { EntityHeader } from "@/components/dashboard/entity-header";
 import { StylesDataTable } from "@/components/dashboard/styles-data-table";
 
@@ -23,7 +25,11 @@ export default async function DashboardEstilosPage() {
           badge="Entidades"
           title="Estilos"
           description="Administracion de estilos visuales para colecciones, branding y experiencias."
-          action={<CreateStyleAction />}
+          action={
+            <Button asChild>
+              <Link href={dashboardRoutes.estilos.crear()}>Crear estilo</Link>
+            </Button>
+          }
         />
         <StylesDataTable />
       </div>

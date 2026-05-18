@@ -126,5 +126,9 @@ export function mapProductRow(row: ProductRow): Product {
 export const PRODUCT_SELECT =
   "*, hat_style:hat_styles(*), categories:product_categories(category:categories(*)), discounts:product_discounts(discount:discounts(id,name))";
 
+/** Listado de descuentos (sin productos vinculados). */
+export const DISCOUNT_LIST_SELECT = "*";
+
+/** Detalle de descuento con productos asociados. */
 export const DISCOUNT_SELECT =
   "*, product_discounts(product:products(id,name))";

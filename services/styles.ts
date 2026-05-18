@@ -12,6 +12,20 @@ export async function getStyles(
   return ((data ?? []) as HatStyleRow[]).map(mapHatStyleRow);
 }
 
+export async function getStyleById(
+  supabase: SupabaseClient,
+  id: string
+): Promise<HatStyle | null> {
+  const { data, error } = await supabase
+    .from("hat_styles")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return mapHatStyleRow(data as HatStyleRow);
+}
+
 export async function getStylesWithCount(
   supabase: SupabaseClient
 ): Promise<HatStyleWithCount[]> {

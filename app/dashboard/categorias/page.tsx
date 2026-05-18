@@ -4,8 +4,10 @@ import { getQueryClient } from "@/lib/get-query-client";
 import { queryKeys } from "@/lib/query-keys";
 import { getCategories } from "@/services/categories";
 import { CategoriesDataTable } from "@/components/dashboard/categories-data-table";
-import { CreateCategoryAction } from "@/components/dashboard/create-category-dialog";
+import Link from "next/link";
 import { EntityHeader } from "@/components/dashboard/entity-header";
+import { Button } from "@/components/ui/button";
+import { dashboardRoutes } from "@/lib/dashboard-routes";
 
 export default async function DashboardCategoriasPage() {
   const supabase = await createClient();
@@ -23,7 +25,11 @@ export default async function DashboardCategoriasPage() {
           badge="Entidades"
           title="Categorias"
           description="Control de categorias para organizar productos y mejorar filtros de compra."
-          action={<CreateCategoryAction />}
+          action={
+            <Button asChild>
+              <Link href={dashboardRoutes.categorias.crear()}>Crear categoria</Link>
+            </Button>
+          }
         />
         <CategoriesDataTable />
       </div>

@@ -13,8 +13,10 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import Link from "next/link";
 import { Pencil, Trash2, UserCircle2 } from "lucide-react";
 import type { Profile } from "@/types";
+import { dashboardRoutes } from "@/lib/dashboard-routes";
 import { useProfiles } from "@/hooks/use-profiles";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useDeleteProfile } from "@/hooks/mutations/use-delete-profile";
@@ -34,7 +36,6 @@ import { DataTablePagination } from "./data-table-pagination";
 import { DataTableViewOptions } from "./data-table-view-options";
 import { DataTableBulkDelete } from "./data-table-bulk-delete";
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
-import { EditProfileDialog } from "./edit-profile-sheet";
 
 const ROLE_CONFIG: Record<string, { label: string; className: string }> = {
   admin: {
@@ -47,10 +48,7 @@ const ROLE_CONFIG: Record<string, { label: string; className: string }> = {
   },
 };
 
-function createColumns(
-  onEdit: (p: Profile) => void,
-  onDelete: (p: Profile) => void
-): ColumnDef<Profile>[] {
+function createColumns(onDelete: (p: Profile) => void): ColumnDef<Profile>[] {
   return [
     {
       id: "select",
@@ -85,14 +83,17 @@ function createColumns(
       cell: ({ row }) => {
         const src = row.original.avatar_url;
         return src ? (
-          <div className="size-9 overflow-hidden rounded-full border border-border">
+          <Link
+            href={dashboardRoutes.perfiles.detail(row.original.id)}
+            className="block size-9 overflow-hidden rounded-full border border-border"
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={src}
               alt={row.original.full_name ?? "Avatar"}
               className="size-full object-cover"
             />
-          </div>
+          </Link>
         ) : (
           <div className="size-9 rounded-full border border-border bg-surface-2 flex items-center justify-center">
             <UserCircle2 className="size-5 text-muted/50" />
@@ -108,11 +109,14 @@ function createColumns(
         <DataTableColumnHeader column={column} title="Nombre" />
       ),
       cell: ({ row }) => (
-        <span className="font-medium text-text">
+        <Link
+          href={dashboardRoutes.perfiles.detail(row.original.id)}
+          className="font-medium text-text hover:text-accent"
+        >
           {row.getValue<string>("full_name") || (
             <span className="text-muted italic">Sin nombre</span>
           )}
-        </span>
+        </Link>
       ),
     },
     {
@@ -154,13 +158,10 @@ function createColumns(
       header: () => null,
       cell: ({ row }) => (
         <div className="flex items-center justify-end gap-1">
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={() => onEdit(row.original)}
-            title="Editar"
-          >
-            <Pencil />
+          <Button variant="ghost" size="icon-sm" asChild title="Editar">
+            <Link href={dashboardRoutes.perfiles.editar(row.original.id)}>
+              <Pencil />
+            </Link>
           </Button>
           <Button
             variant="ghost"
@@ -192,12 +193,11 @@ export function ProfilesDataTable() {
 
   const deleteProfile = useDeleteProfile();
 
-  const [editingProfile, setEditingProfile] = React.useState<Profile | null>(null);
   const [deletingProfile, setDeletingProfile] = React.useState<Profile | null>(null);
   const [error, setError] = React.useState<string | null>(null);
 
   const columns = React.useMemo(
-    () => createColumns(setEditingProfile, setDeletingProfile),
+    () => createColumns(setDeletingProfile),
     []
   );
 
@@ -336,19 +336,6 @@ export function ProfilesDataTable() {
       </div>
 
       <DataTablePagination table={table} />
-
-      {editingProfile && (
-        <EditProfileDialog
-          open={!!editingProfile}
-          onOpenChange={(open) => !open && setEditingProfile(null)}
-          profile={{
-            id: editingProfile.id,
-            full_name: editingProfile.full_name,
-            avatar_url: editingProfile.avatar_url,
-            role: editingProfile.role,
-          }}
-        />
-      )}
 
       <DeleteConfirmDialog
         open={!!deletingProfile}

@@ -3,9 +3,11 @@ import { createClient } from "@/lib/supabase/server";
 import { getQueryClient } from "@/lib/get-query-client";
 import { queryKeys } from "@/lib/query-keys";
 import { getDiscounts } from "@/services/discounts";
-import { CreateDiscountAction } from "@/components/dashboard/create-discount-dialog";
+import Link from "next/link";
 import { DiscountsDataTable } from "@/components/dashboard/discounts-data-table";
 import { EntityHeader } from "@/components/dashboard/entity-header";
+import { Button } from "@/components/ui/button";
+import { dashboardRoutes } from "@/lib/dashboard-routes";
 
 export default async function DashboardDescuentosPage() {
   const supabase = await createClient();
@@ -23,7 +25,11 @@ export default async function DashboardDescuentosPage() {
           badge="Entidades"
           title="Descuentos"
           description="Administracion de descuentos por porcentaje o monto fijo."
-          action={<CreateDiscountAction />}
+          action={
+            <Button asChild>
+              <Link href={dashboardRoutes.descuentos.crear()}>Crear descuento</Link>
+            </Button>
+          }
         />
         <DiscountsDataTable />
       </div>
