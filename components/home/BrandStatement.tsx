@@ -16,7 +16,7 @@ export function BrandStatement() {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl">
           {/* Label */}
-          <p className="text-[11px] font-black uppercase tracking-[0.4em] text-accent mb-8">
+          <p className="text-[11px] font-black uppercase tracking-[0.4em] text-primary mb-8">
             Nuestra filosofía
           </p>
 
@@ -30,7 +30,7 @@ export function BrandStatement() {
 
           {/* Divider */}
           <div className="flex items-center gap-4 mb-10">
-            <div className="w-12 h-0.5 bg-accent" />
+            <div className="w-12 h-0.5 bg-primary" />
             <p className="text-[11px] uppercase tracking-[0.3em] text-muted">
               Crea Caps
             </p>
@@ -56,7 +56,7 @@ export function BrandStatement() {
               },
             ].map((pillar) => (
               <div key={pillar.title}>
-                <span className="text-accent text-lg mb-3 block">{pillar.icon}</span>
+                <span className="text-primary text-lg mb-3 block">{pillar.icon}</span>
                 <h4 className="text-xs font-black uppercase tracking-widest text-text mb-2">
                   {pillar.title}
                 </h4>

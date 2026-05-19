@@ -33,15 +33,9 @@ export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const adminPrefixes = [
     "/dashboard",
-    "/dashboard-2",
-    "/mail",
     "/tasks",
-    "/chat",
-    "/calendar",
     "/users",
     "/settings",
-    "/faqs",
-    "/pricing",
   ];
   const isAdminRoute = adminPrefixes.some(
     (prefix) => path === prefix || path.startsWith(`${prefix}/`)

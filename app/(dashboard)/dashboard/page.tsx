@@ -1,35 +1,32 @@
 import { ChartAreaInteractive } from "./components/chart-area-interactive"
-import { DataTable } from "./components/data-table"
-import { SectionCards } from "./components/section-cards"
+import { MetricsOverview } from "./components/metrics-overview"
+import { QuickActions } from "./components/quick-actions"
+import { RecentTransactions } from "./components/recent-transactions"
+import { TopProducts } from "./components/top-products"
 
-import data from "./data/data.json"
-import pastPerformanceData from "./data/past-performance-data.json"
-import keyPersonnelData from "./data/key-personnel-data.json"
-import focusDocumentsData from "./data/focus-documents-data.json"
-
-export default function Page() {
+export default function DashboardPage() {
   return (
-    <>
-      {/* Page Title and Description */}
-      <div className="px-4 lg:px-6">
+    <div className="flex-1 space-y-6 px-6 pt-0">
+      <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center md:gap-6">
         <div className="flex flex-col gap-2">
-          <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground">Welcome to your admin dashboard</p>
+          <h1 className="text-2xl font-bold tracking-tight">Business Dashboard</h1>
+          <p className="text-muted-foreground">
+            Monitor your business performance and key metrics in real-time
+          </p>
+        </div>
+        <QuickActions />
+      </div>
+
+      <div className="@container/main space-y-6">
+        <MetricsOverview />
+
+        <ChartAreaInteractive />
+
+        <div className="grid grid-cols-1 gap-6 @5xl:grid-cols-2">
+          <RecentTransactions />
+          <TopProducts />
         </div>
       </div>
-
-      <div className="@container/main px-4 lg:px-6 space-y-6">
-        <SectionCards />
-        <ChartAreaInteractive />
-      </div>
-      <div className="@container/main">
-        <DataTable
-          data={data}
-          pastPerformanceData={pastPerformanceData}
-          keyPersonnelData={keyPersonnelData}
-          focusDocumentsData={focusDocumentsData}
-        />
-      </div>
-    </>
+    </div>
   )
 }

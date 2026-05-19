@@ -13,7 +13,7 @@ export function FeaturedProducts() {
       {/* Header */}
       <div className="flex items-end justify-between mb-12">
         <div>
-          <p className="text-[11px] font-black uppercase tracking-[0.3em] text-accent mb-2">
+          <p className="text-[11px] font-black uppercase tracking-[0.3em] text-primary mb-2">
             Selección destacada
           </p>
           <h2 className="font-black uppercase text-4xl sm:text-5xl tracking-tighter text-text leading-none">

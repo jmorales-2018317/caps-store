@@ -27,11 +27,11 @@ export function FooterNewsletter() {
         onChange={(e) => setEmail(e.target.value)}
         placeholder="tu@correo.com"
         required
-        className="flex-1 bg-surface border border-border text-text text-xs px-4 py-3 placeholder:text-faint focus:outline-none focus:border-accent transition-colors duration-200 min-w-0"
+        className="flex-1 bg-surface border border-border text-text text-xs px-4 py-3 placeholder:text-faint focus:outline-none focus:border-primary transition-colors duration-200 min-w-0"
       />
       <button
         type="submit"
-        className="bg-accent text-bg text-[10px] font-black uppercase tracking-widest px-4 py-3 hover:bg-accent-hover transition-colors duration-200 whitespace-nowrap"
+        className="bg-primary text-bg text-[10px] font-black uppercase tracking-widest px-4 py-3 hover:bg-primary/90 transition-colors duration-200 whitespace-nowrap"
       >
         Unirme
       </button>

@@ -56,7 +56,7 @@ export function CartItem({ item }: CartItemProps) {
             <div className="min-w-0">
               <Link
                 href={`/products/${product.id}`}
-                className="text-foreground block text-lg font-medium hover:text-accent transition-colors"
+                className="text-foreground block text-lg font-medium hover:text-primary transition-colors"
               >
                 <h3>{product.name}</h3>
               </Link>

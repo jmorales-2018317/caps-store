@@ -143,7 +143,7 @@ export function ProductDetailClient({ productId }: ProductDetailClientProps) {
                   className={cn(
                     "relative w-20 h-20 overflow-hidden border-2 transition-colors duration-200",
                     selectedImage === i
-                      ? "border-accent"
+                      ? "border-primary"
                       : "border-border hover:border-muted"
                   )}
                 >
@@ -163,7 +163,7 @@ export function ProductDetailClient({ productId }: ProductDetailClientProps) {
         {/* Product info */}
         <div className="lg:pt-2">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-accent font-bold">
+            <p className="text-[11px] uppercase tracking-[0.2em] text-primary font-bold">
               {p.hat_style.label}
             </p>
           </div>
@@ -182,7 +182,7 @@ export function ProductDetailClient({ productId }: ProductDetailClientProps) {
               </span>
             )}
             {discountPct && (
-              <span className="text-xs font-black text-bg bg-accent px-2 py-0.5">
+              <span className="text-xs font-black text-bg bg-primary px-2 py-0.5">
                 -{discountPct}%
               </span>
             )}
@@ -211,7 +211,7 @@ export function ProductDetailClient({ productId }: ProductDetailClientProps) {
                   className={cn(
                     "w-8 h-8 transition-all duration-200",
                     activeColor.name === color.name
-                      ? "ring-2 ring-accent ring-offset-2 ring-offset-bg"
+                      ? "ring-2 ring-primary ring-offset-2 ring-offset-bg"
                       : "ring-1 ring-border hover:ring-muted"
                   )}
                   style={{ backgroundColor: color.hex }}
@@ -227,7 +227,7 @@ export function ProductDetailClient({ productId }: ProductDetailClientProps) {
                 <p className="text-[11px] font-black uppercase tracking-[0.2em] text-text">
                   Talla
                 </p>
-                <button className="text-[10px] uppercase tracking-widest text-accent hover:text-accent-hover transition-colors font-bold">
+                <button className="text-[10px] uppercase tracking-widest text-primary hover:text-primary/90 transition-colors font-bold">
                   Guía de tallas
                 </button>
               </div>

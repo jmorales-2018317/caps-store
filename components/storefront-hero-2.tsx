@@ -82,7 +82,7 @@ export function StorefrontHero2({
   }
 
   return (
-    <section className="relative isolate min-h-[min(88dvh,820px)] overflow-hidden bg-linear-to-b from-bg to-accent/10">
+    <section className="relative isolate min-h-[min(88dvh,820px)] overflow-hidden bg-linear-to-b from-bg to-primary/10">
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.035]"
         aria-hidden
@@ -97,7 +97,7 @@ export function StorefrontHero2({
         />
       </div>
       <div
-        className="pointer-events-none absolute -top-32 right-[-8%] h-[min(560px,90vw)] w-[min(560px,90vw)] rounded-full bg-accent/12 blur-[130px]"
+        className="pointer-events-none absolute -top-32 right-[-8%] h-[min(560px,90vw)] w-[min(560px,90vw)] rounded-full bg-primary/12 blur-[130px]"
         aria-hidden
       />
       <div
@@ -110,7 +110,7 @@ export function StorefrontHero2({
           <header className="relative z-10 flex flex-col gap-8">
             <Badge
               variant="outline"
-              className="flex h-auto w-fit items-center gap-2 rounded-full border-accent/35 px-4 py-2 font-semibold text-accent"
+              className="flex h-auto w-fit items-center gap-2 rounded-full border-primary/35 px-4 py-2 font-semibold text-primary"
             >
               <TrendingUp className="size-4" aria-hidden />
               Tienda oficial
@@ -118,7 +118,7 @@ export function StorefrontHero2({
 
             <h1 className="text-balance text-5xl leading-tight font-bold tracking-tight text-text md:text-6xl lg:text-7xl">
               Gorras con{" "}
-              <span className="bg-linear-to-r from-accent via-[#e8d9a8] to-accent bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-primary via-[#e4d4a8] to-primary bg-clip-text font-semibold text-transparent">
                 actitud real
               </span>
             </h1>
@@ -148,7 +148,7 @@ export function StorefrontHero2({
               <Button
                 type="submit"
                 size="lg"
-                className="absolute end-2 top-1/2 h-10 -translate-y-1/2 cursor-pointer rounded-full bg-accent px-6 text-bg hover:bg-accent-hover"
+                className="absolute end-2 top-1/2 h-10 -translate-y-1/2 cursor-pointer rounded-full bg-primary px-6 text-bg hover:bg-primary/90"
               >
                 Buscar
               </Button>
@@ -157,7 +157,7 @@ export function StorefrontHero2({
             <div className="flex flex-wrap items-center gap-4">
               <Button
                 size="lg"
-                className="h-10 cursor-pointer rounded-full bg-accent px-6 text-bg hover:bg-accent-hover"
+                className="h-10 cursor-pointer rounded-full bg-primary px-6 text-bg hover:bg-primary/90"
                 asChild
               >
                 <Link href="/products">
@@ -168,7 +168,7 @@ export function StorefrontHero2({
               <Button
                 size="lg"
                 variant="outline"
-                className="h-10 cursor-pointer rounded-full border-border/80 px-6 text-text hover:border-accent/40 hover:text-accent"
+                className="h-10 cursor-pointer rounded-full border-border/80 px-6 text-text hover:border-primary/40 hover:text-primary"
                 asChild
               >
                 <Link href="/products?reciente=1">
@@ -223,7 +223,7 @@ export function StorefrontHero2({
                                 <div className="absolute inset-0 bg-linear-to-t from-bg/95 via-bg/40 to-transparent" />
                                 <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
                                   <div className="relative z-10 flex max-w-md flex-col gap-4">
-                                    <Badge className="w-fit rounded-full bg-accent px-2.5 py-0.5 font-semibold text-bg">
+                                    <Badge className="w-fit rounded-full bg-primary px-2.5 py-0.5 font-semibold text-bg">
                                       {productTag(product)}
                                     </Badge>
                                     <h2 className="text-3xl font-bold text-text sm:text-4xl">
@@ -236,7 +236,7 @@ export function StorefrontHero2({
                                     <div className="flex flex-wrap items-center gap-4 pt-2">
                                       <Button
                                         size="lg"
-                                        className="h-10 cursor-pointer rounded-full bg-accent px-8 text-bg hover:bg-accent-hover"
+                                        className="h-10 cursor-pointer rounded-full bg-primary px-8 text-bg hover:bg-primary/90"
                                         asChild
                                       >
                                         <Link href={`/products/${product.id}`}>
@@ -261,7 +261,7 @@ export function StorefrontHero2({
                                 {product.featured && (
                                   <div className="absolute end-4 top-4 flex items-center gap-1 rounded-full bg-bg/30 px-3 py-1 text-sm font-medium text-text backdrop-blur-xs sm:end-6 sm:top-6">
                                     <Flame
-                                      className="size-4 text-accent"
+                                      className="size-4 text-primary"
                                       aria-hidden
                                     />
                                     Destacado
@@ -288,7 +288,7 @@ export function StorefrontHero2({
                     className={cn(
                       "size-3 rounded-full transition-all",
                       currentSlide === index
-                        ? "bg-accent"
+                        ? "bg-primary"
                         : "bg-muted/40 hover:bg-muted/70"
                     )}
                     aria-label={`Ir al slide ${index + 1}`}

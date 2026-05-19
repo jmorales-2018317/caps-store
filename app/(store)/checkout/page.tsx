@@ -228,7 +228,7 @@ function CheckoutFlow() {
     const shortId = placedOrderId.slice(0, 8).toUpperCase();
     return (
       <div className="max-w-xl mx-auto px-4 py-32 text-center">
-        <div className="w-16 h-16 bg-accent flex items-center justify-center mx-auto mb-8">
+        <div className="w-16 h-16 bg-primary flex items-center justify-center mx-auto mb-8">
           <Check className="w-8 h-8 text-bg" />
         </div>
         <h1 className="font-black uppercase text-3xl tracking-tighter text-text mb-4">
@@ -291,7 +291,7 @@ function CheckoutFlow() {
       </Link>
 
       <div className="mb-10">
-        <p className="text-[11px] font-black uppercase tracking-[0.3em] text-accent mb-1">
+        <p className="text-[11px] font-black uppercase tracking-[0.3em] text-primary mb-1">
           Checkout
         </p>
         <h1 className="font-black uppercase text-4xl sm:text-5xl tracking-tighter text-text leading-none">
@@ -310,7 +310,7 @@ function CheckoutFlow() {
               className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-colors ${step === s.id
                 ? "text-text"
                 : STEP_ORDER.indexOf(s.id) < currentIdx
-                  ? "text-accent"
+                  ? "text-primary"
                   : "text-faint"
                 }`}
             >
@@ -318,7 +318,7 @@ function CheckoutFlow() {
                 className={`w-6 h-6 flex items-center justify-center border ${step === s.id
                   ? "border-text bg-text text-bg"
                   : STEP_ORDER.indexOf(s.id) < currentIdx
-                    ? "border-accent bg-accent text-bg"
+                    ? "border-primary bg-primary text-bg"
                     : "border-faint"
                   }`}
               >
@@ -333,7 +333,7 @@ function CheckoutFlow() {
             {i < steps.length - 1 && (
               <div
                 className={`w-8 h-px mx-2 ${STEP_ORDER.indexOf(s.id) < currentIdx
-                  ? "bg-accent"
+                  ? "bg-primary"
                   : "bg-border"
                   }`}
               />
@@ -382,7 +382,7 @@ function CheckoutFlow() {
                               fulfillment: "pickup",
                             }))
                           }
-                          className="accent-accent"
+                          className="accent-primary"
                         />
                         <Store className="w-4 h-4 text-muted shrink-0" />
                         <div>
@@ -416,7 +416,7 @@ function CheckoutFlow() {
                               fulfillment: "delivery",
                             }))
                           }
-                          className="accent-accent"
+                          className="accent-primary"
                         />
                         <Truck className="w-4 h-4 text-muted shrink-0" />
                         <div>
@@ -816,7 +816,7 @@ function CheckoutFlow() {
                       className="object-cover"
                       sizes="56px"
                     />
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-accent text-bg text-[9px] font-black flex items-center justify-center rounded-full">
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-bg text-[9px] font-black flex items-center justify-center rounded-full">
                       {item.quantity}
                     </span>
                   </div>

@@ -38,14 +38,14 @@ export function AccountEmptyState({
         <div className="text-center">
           <div className="mx-auto mb-8 flex h-16 w-16 items-center justify-center rounded-2xl border border-border">
             <Icon
-              className="h-7 w-7 text-accent"
+              className="h-7 w-7 text-primary"
               strokeWidth={1.5}
               aria-hidden
             />
           </div>
 
           {eyebrow ? (
-            <p className="mb-3 text-[10px] font-black uppercase tracking-[0.35em] text-accent">
+            <p className="mb-3 text-[10px] font-black uppercase tracking-[0.35em] text-primary">
               {eyebrow}
             </p>
           ) : null}
@@ -86,7 +86,7 @@ export function AccountPanelLoading({ label }: { label: string }) {
     <div className="flex min-h-[min(320px,70vh)] items-center justify-center rounded-2xl border border-dashed border-border px-6 py-16">
       <div className="flex flex-col items-center gap-4 text-muted">
         <Loader2
-          className="h-8 w-8 shrink-0 animate-spin text-accent motion-reduce:animate-none"
+          className="h-8 w-8 shrink-0 animate-spin text-primary motion-reduce:animate-none"
           aria-hidden
         />
         <p className="text-sm">{label}</p>

@@ -13,7 +13,7 @@ export function Categories() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
         {/* Header */}
         <div className="mb-12">
-          <p className="text-[11px] font-black uppercase tracking-[0.3em] text-accent mb-2">
+          <p className="text-[11px] font-black uppercase tracking-[0.3em] text-primary mb-2">
             Explora por estilo
           </p>
           <h2 className="font-black uppercase text-4xl sm:text-5xl tracking-tighter text-text leading-none">
@@ -52,14 +52,14 @@ export function Categories() {
                   <h3 className="font-black uppercase text-xl tracking-tight text-text leading-none mb-3">
                     {style.label}
                   </h3>
-                  <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-accent opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
+                  <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-primary opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
                     Ver
                     <ArrowRight className="w-3 h-3" />
                   </span>
                 </div>
 
                 {/* Accent line on hover */}
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
               </div>
             </Link>
           ))}

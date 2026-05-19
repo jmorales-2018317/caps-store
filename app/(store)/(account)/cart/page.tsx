@@ -106,7 +106,7 @@ export default function CartPage() {
             </div>
 
             {shipping > 0 && (
-              <p className="text-muted-foreground border-accent border-l-2 bg-muted/30 px-3 py-2 text-xs">
+              <p className="text-muted-foreground border-primary border-l-2 bg-muted/30 px-3 py-2 text-xs">
                 Añade{" "}
                 <span className="text-foreground font-semibold">
                   {formatPrice(FREE_SHIPPING_MINIMUM_GTQ - cartTotal)}

@@ -52,7 +52,7 @@ export function HeroSearchForm({ className }: HeroSearchFormProps) {
         </div>
         <button
           type="submit"
-          className="shrink-0 rounded-xl bg-accent px-5 py-3 text-[13px] font-semibold text-bg transition-colors hover:bg-accent-hover active:scale-[0.98]"
+          className="shrink-0 rounded-xl bg-primary px-5 py-3 text-[13px] font-semibold text-bg transition-colors hover:bg-primary/90 active:scale-[0.98]"
         >
           Buscar
         </button>

@@ -17,14 +17,14 @@ export function AuthPageShell({
           className="absolute inset-0 opacity-[0.07] pointer-events-none"
           style={{
             backgroundImage:
-              "repeating-linear-gradient(-45deg, transparent, transparent 12px, var(--color-accent) 12px, var(--color-accent) 13px)",
+              "repeating-linear-gradient(-45deg, transparent, transparent 12px, var(--color-primary) 12px, var(--color-primary) 13px)",
           }}
           aria-hidden
         />
         <div className="relative z-10 flex flex-col justify-center px-8 py-14 lg:py-24 lg:pl-12 lg:pr-10 min-h-[200px] lg:min-h-full">
           <Link
             href="/"
-            className="font-black text-2xl tracking-tighter text-text hover:text-accent transition-colors duration-200 cursor-pointer w-fit"
+            className="font-black text-2xl tracking-tighter text-text hover:text-primary transition-colors duration-200 cursor-pointer w-fit"
           >
             Crea Caps
           </Link>

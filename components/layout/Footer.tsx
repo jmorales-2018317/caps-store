@@ -25,7 +25,7 @@ export function Footer() {
           <div className="md:col-span-1">
             <Link
               href="/"
-              className="font-black text-3xl tracking-tighter text-text hover:text-accent transition-colors duration-200"
+              className="font-black text-3xl tracking-tighter text-text hover:text-primary transition-colors duration-200"
             >
               Crea Caps
             </Link>

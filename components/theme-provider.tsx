@@ -1,59 +1,37 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { ThemeProviderContext } from "@/contexts/theme-context"
-
-type Theme = "dark" | "light" | "system"
+import * as React from "react";
+import { ThemeProviderContext } from "@/contexts/theme-context";
 
 type ThemeProviderProps = {
-  children: React.ReactNode
-  defaultTheme?: Theme
-  storageKey?: string
-}
+  children: React.ReactNode;
+  defaultTheme?: "dark";
+  storageKey?: string;
+};
 
 export function ThemeProvider({
   children,
-  defaultTheme = "system",
-  storageKey = "vite-ui-theme",
+  storageKey = "crea-caps-ui-theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = React.useState<Theme>(
-    () => (typeof window !== "undefined" && localStorage.getItem(storageKey) as Theme) || defaultTheme
-  )
-
   React.useEffect(() => {
-    if (typeof window === "undefined") return
-
-    const root = window.document.documentElement
-
-    root.classList.remove("light", "dark")
-
-    if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light"
-
-      root.classList.add(systemTheme)
-      return
-    }
-
-    root.classList.add(theme)
-  }, [theme])
+    const root = document.documentElement;
+    root.classList.remove("light");
+    root.classList.add("dark");
+    root.style.colorScheme = "dark";
+    localStorage.setItem(storageKey, "dark");
+  }, [storageKey]);
 
   const value = {
-    theme,
-    setTheme: (theme: Theme) => {
-      if (typeof window !== "undefined") {
-        localStorage.setItem(storageKey, theme)
-      }
-      setTheme(theme)
+    theme: "dark" as const,
+    setTheme: () => {
+      /* Solo dark mode — sin cambio de tema. */
     },
-  }
+  };
 
   return (
     <ThemeProviderContext.Provider {...props} value={value}>
       {children}
     </ThemeProviderContext.Provider>
-  )
+  );
 }

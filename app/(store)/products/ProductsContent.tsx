@@ -189,7 +189,7 @@ export function ProductsContent() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Page header */}
       <div className="mb-10">
-        <p className="text-[11px] font-black uppercase tracking-[0.3em] text-accent mb-2">
+        <p className="text-[11px] font-black uppercase tracking-[0.3em] text-primary mb-2">
           Todos los estilos
         </p>
         <h1 className="font-black uppercase text-4xl sm:text-5xl tracking-tighter text-text leading-none">
@@ -248,7 +248,7 @@ export function ProductsContent() {
                 <SlidersHorizontal className="w-3.5 h-3.5" />
                 Filtros
                 {hasFilters && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                 )}
               </button>
 

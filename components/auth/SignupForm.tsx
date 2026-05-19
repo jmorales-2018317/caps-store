@@ -24,7 +24,7 @@ function FormMessages({ state }: { state: AuthFormState | undefined }) {
     return (
       <p
         role="alert"
-        className="text-sm text-accent border border-border bg-surface-2 px-3 py-2 mb-4"
+        className="text-sm text-primary border border-border bg-surface-2 px-3 py-2 mb-4"
       >
         {state.error}
       </p>
@@ -135,7 +135,7 @@ export function SignupForm({ redirectTo }: { redirectTo?: string }) {
               ? `/login?redirect=${encodeURIComponent(redirectTo)}`
               : "/login"
           }
-          className="font-bold text-accent hover:text-accent-hover transition-colors duration-200 cursor-pointer"
+          className="font-bold text-primary hover:text-primary/90 transition-colors duration-200 cursor-pointer"
         >
           Inicia sesión
         </Link>

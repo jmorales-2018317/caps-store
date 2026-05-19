@@ -66,7 +66,7 @@ export function AccountSectionShell({
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-8 flex flex-col gap-2 text-center">
-        <p className="text-accent text-[11px] font-black uppercase tracking-[0.3em]">
+        <p className="text-primary text-[11px] font-black uppercase tracking-[0.3em]">
           Tu cuenta
         </p>
         <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -89,7 +89,7 @@ export function AccountSectionShell({
               className={cn(
                 "-mb-px flex-1 border-b-2 py-3 text-center text-sm font-semibold transition-colors",
                 isActive
-                  ? "border-accent text-foreground"
+                  ? "border-primary text-foreground"
                   : "border-transparent text-muted-foreground hover:text-foreground"
               )}
               aria-current={isActive ? "page" : undefined}

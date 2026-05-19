@@ -89,7 +89,7 @@ export function Navbar() {
             <div className="flex items-center gap-6 lg:gap-10 min-w-0 shrink-0">
               <Link
                 href="/"
-                className="font-black text-2xl tracking-tighter text-text hover:text-accent transition-colors duration-200 shrink-0"
+                className="font-black text-2xl tracking-tighter text-text hover:text-primary transition-colors duration-200 shrink-0"
               >
                 Crea Caps
               </Link>
@@ -131,7 +131,7 @@ export function Navbar() {
               >
                 <ShoppingBag className="w-5 h-5" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center w-4 h-4 bg-accent text-bg text-[9px] font-black rounded-full">
+                  <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center w-4 h-4 bg-primary text-bg text-[9px] font-black rounded-full">
                     {cartCount > 9 ? "9+" : cartCount}
                   </span>
                 )}
@@ -189,8 +189,8 @@ export function Navbar() {
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     {profileRole === "admin" && (
-                      <DropdownMenuItem asChild className="focus:text-accent">
-                        <Link href="/dashboard" className="cursor-pointer hover:text-accent">
+                      <DropdownMenuItem asChild className="focus:text-primary">
+                        <Link href="/dashboard" className="cursor-pointer hover:text-primary">
                           <LayoutDashboard className="h-4 w-4 shrink-0" aria-hidden />
                           Dashboard
                         </Link>

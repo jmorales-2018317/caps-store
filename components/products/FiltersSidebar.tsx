@@ -77,7 +77,7 @@ export function FiltersSidebar({
           {hasFilters && (
             <button
               onClick={clearAll}
-              className="text-[10px] uppercase tracking-widest text-accent hover:text-accent-hover font-bold transition-colors"
+              className="text-[10px] uppercase tracking-widest text-primary hover:text-primary/90 font-bold transition-colors"
             >
               Borrar todo
             </button>
@@ -119,7 +119,7 @@ export function FiltersSidebar({
                 >
                   <span>{style.label}</span>
                   {selectedStyle === style.id && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                   )}
                 </button>
               ))}
@@ -152,7 +152,7 @@ export function FiltersSidebar({
                 >
                   <span>{cat.label}</span>
                   {selectedCategory === cat.id && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                   )}
                 </button>
               ))}
@@ -181,7 +181,7 @@ export function FiltersSidebar({
                 >
                   <span>{label}</span>
                   {isOn ? (
-                    <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                   ) : null}
                 </button>
               );
@@ -213,7 +213,7 @@ export function FiltersSidebar({
               >
                 <span>{range.label}</span>
                 {selectedPrice === range.id && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                 )}
               </button>
             ))}

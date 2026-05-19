@@ -4,7 +4,6 @@ import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import { ReactQueryProvider } from "@/components/providers/ReactQueryProvider";
 import { ThemeProvider } from "@/components/theme-provider";
-import { SidebarConfigProvider } from "@/contexts/sidebar-context";
 import { Toaster } from "@/components/ui/sonner";
 import { inter } from "@/lib/fonts";
 
@@ -36,13 +35,11 @@ export default function RootLayout({
       className={`${geistSans.variable} ${inter.variable} dark h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col bg-bg text-text">
+      <body className="min-h-full flex flex-col bg-background text-foreground">
         <ThemeProvider defaultTheme="dark" storageKey="crea-caps-ui-theme">
-          <SidebarConfigProvider>
-            <ReactQueryProvider>
-              <CartProvider>{children}</CartProvider>
-            </ReactQueryProvider>
-          </SidebarConfigProvider>
+          <ReactQueryProvider>
+            <CartProvider>{children}</CartProvider>
+          </ReactQueryProvider>
         </ThemeProvider>
         <Toaster richColors closeButton position="top-right" />
       </body>

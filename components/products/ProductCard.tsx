@@ -55,7 +55,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
         {/* Discount % */}
         {discountPct && (
-          <div className="absolute top-3 right-3 z-10 bg-accent text-bg text-[10px] font-black px-2 py-0.5">
+          <div className="absolute top-3 right-3 z-10 bg-primary text-bg text-[10px] font-black px-2 py-0.5">
             -{discountPct}%
           </div>
         )}
@@ -64,7 +64,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="absolute inset-0 bg-bg/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-6">
           <button
             onClick={handleQuickAdd}
-            className="flex items-center gap-2 bg-accent text-bg text-[10px] font-black uppercase tracking-widest px-5 py-3 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 hover:bg-accent-hover"
+            className="flex items-center gap-2 bg-primary text-bg text-[10px] font-black uppercase tracking-widest px-5 py-3 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 hover:bg-primary/90"
           >
             <ShoppingBag className="w-3.5 h-3.5" />
             Añadir rápido
@@ -94,7 +94,7 @@ export function ProductCard({ product }: ProductCardProps) {
         </p>
 
         {/* Name */}
-        <h3 className="text-sm font-bold text-text group-hover:text-accent transition-colors duration-200 leading-tight">
+        <h3 className="text-sm font-bold text-text group-hover:text-primary transition-colors duration-200 leading-tight">
           {product.name}
         </h3>
 

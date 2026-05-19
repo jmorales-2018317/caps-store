@@ -2,8 +2,8 @@ import { cn } from "@/lib/utils";
 import type { Badge as BadgeType } from "@/types";
 
 const badgeConfig: Record<BadgeType, { label: string; className: string }> = {
-  new: { label: "Novedad", className: "bg-accent text-bg" },
-  reciente: { label: "Recién ingreso", className: "bg-accent text-bg" },
+  new: { label: "Novedad", className: "bg-primary text-bg" },
+  reciente: { label: "Recién ingreso", className: "bg-primary text-bg" },
   limited: {
     label: "Edición limitada",
     className: "bg-surface-2 text-muted border border-border",
