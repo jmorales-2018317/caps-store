@@ -31,7 +31,22 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
-  if (path.startsWith("/dashboard") && !user) {
+  const adminPrefixes = [
+    "/dashboard",
+    "/dashboard-2",
+    "/mail",
+    "/tasks",
+    "/chat",
+    "/calendar",
+    "/users",
+    "/settings",
+    "/faqs",
+    "/pricing",
+  ];
+  const isAdminRoute = adminPrefixes.some(
+    (prefix) => path === prefix || path.startsWith(`${prefix}/`)
+  );
+  if (isAdminRoute && !user) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = "/login";
     const redirectResponse = NextResponse.redirect(loginUrl);

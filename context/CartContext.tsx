@@ -4,7 +4,13 @@ import React, { createContext, useContext, useCallback, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
-import { getOrCreateCartSession, getCartItems } from "@/services/cart";
+import { loadHydratedCart } from "@/lib/cart/load";
+import {
+  clearLines,
+  removeLine,
+  setLineQuantity,
+  upsertLine,
+} from "@/lib/cart/storage";
 import type { CartItem, CartState, Product, ProductColor } from "@/types";
 
 const CartContext = createContext<CartState | null>(null);
@@ -12,69 +18,45 @@ const CartContext = createContext<CartState | null>(null);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const supabase = useMemo(() => createClient(), []);
   const queryClient = useQueryClient();
+  const cartKey = queryKeys.cart.hydrated();
 
-  const { data: sessionId = null, isPending: sessionPending } = useQuery({
-    queryKey: queryKeys.cart.session(),
-    queryFn: () => getOrCreateCartSession(supabase),
-    staleTime: Infinity,
+  const { data: items = [], isPending, isFetching } = useQuery({
+    queryKey: cartKey,
+    queryFn: () => loadHydratedCart(supabase),
+    staleTime: 0,
   });
 
-  const {
-    data: items = [],
-    isPending: itemsPending,
-  } = useQuery({
-    queryKey: queryKeys.cart.items(sessionId ?? ""),
-    queryFn: () => getCartItems(supabase, sessionId!),
-    enabled: !!sessionId,
-  });
-
-  /** Incluye creación de sesión y carga de ítems; evita tratar el carrito como vacío antes de tiempo */
-  const isLoading = sessionPending || (!!sessionId && itemsPending);
+  const isLoading =
+    isPending || (isFetching && items.length === 0);
 
   const addItemMutation = useMutation({
     mutationFn: async ({
       product,
       color,
       size,
+      quantity,
     }: {
       product: Product;
       color: ProductColor;
       size: string;
+      quantity: number;
     }) => {
-      if (!sessionId) return;
-
-      const { data: existing } = await supabase
-        .from("cart_items")
-        .select("id, quantity")
-        .eq("session_id", sessionId)
-        .eq("product_id", product.id)
-        .eq("color_name", color.name)
-        .eq("size", size)
-        .maybeSingle();
-
-      if (existing) {
-        await supabase
-          .from("cart_items")
-          .update({ quantity: (existing.quantity as number) + 1 })
-          .eq("id", existing.id);
-      } else {
-        await supabase.from("cart_items").insert({
-          session_id: sessionId,
-          product_id: product.id,
-          color_name: color.name,
-          color_hex: color.hex,
+      upsertLine(
+        {
+          productId: product.id,
+          colorName: color.name,
+          colorHex: color.hex,
           size,
-          quantity: 1,
-        });
-      }
+          quantity,
+        },
+        "add"
+      );
     },
-    onMutate: async ({ product, color, size }) => {
-      if (!sessionId) return;
-      const key = queryKeys.cart.items(sessionId);
-      await queryClient.cancelQueries({ queryKey: key });
-      const previous = queryClient.getQueryData<CartItem[]>(key) ?? [];
+    onMutate: async ({ product, color, size, quantity }) => {
+      await queryClient.cancelQueries({ queryKey: cartKey });
+      const previous = queryClient.getQueryData<CartItem[]>(cartKey) ?? [];
 
-      queryClient.setQueryData<CartItem[]>(key, (old = []) => {
+      queryClient.setQueryData<CartItem[]>(cartKey, (old = []) => {
         const idx = old.findIndex(
           (i) =>
             i.product.id === product.id &&
@@ -83,27 +65,24 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         );
         if (idx >= 0) {
           return old.map((item, i) =>
-            i === idx ? { ...item, quantity: item.quantity + 1 } : item
+            i === idx ? { ...item, quantity: item.quantity + quantity } : item
           );
         }
         return [
           ...old,
-          { product, quantity: 1, selectedColor: color, selectedSize: size },
+          { product, quantity, selectedColor: color, selectedSize: size },
         ];
       });
 
       return { previous };
     },
     onError: (_err, _vars, context) => {
-      if (!sessionId || !context) return;
-      queryClient.setQueryData(queryKeys.cart.items(sessionId), context.previous);
+      if (context) {
+        queryClient.setQueryData(cartKey, context.previous);
+      }
     },
     onSettled: () => {
-      if (sessionId) {
-        void queryClient.invalidateQueries({
-          queryKey: queryKeys.cart.items(sessionId),
-        });
-      }
+      void queryClient.invalidateQueries({ queryKey: cartKey });
     },
   });
 
@@ -117,22 +96,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       color: string;
       size: string;
     }) => {
-      if (!sessionId) return;
-      await supabase
-        .from("cart_items")
-        .delete()
-        .eq("session_id", sessionId)
-        .eq("product_id", productId)
-        .eq("color_name", color)
-        .eq("size", size);
+      removeLine(productId, color, size);
     },
     onMutate: async ({ productId, color, size }) => {
-      if (!sessionId) return;
-      const key = queryKeys.cart.items(sessionId);
-      await queryClient.cancelQueries({ queryKey: key });
-      const previous = queryClient.getQueryData<CartItem[]>(key) ?? [];
+      await queryClient.cancelQueries({ queryKey: cartKey });
+      const previous = queryClient.getQueryData<CartItem[]>(cartKey) ?? [];
 
-      queryClient.setQueryData<CartItem[]>(key, (old = []) =>
+      queryClient.setQueryData<CartItem[]>(cartKey, (old = []) =>
         old.filter(
           (i) =>
             !(
@@ -146,15 +116,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       return { previous };
     },
     onError: (_err, _vars, context) => {
-      if (!sessionId || !context) return;
-      queryClient.setQueryData(queryKeys.cart.items(sessionId), context.previous);
+      if (context) {
+        queryClient.setQueryData(cartKey, context.previous);
+      }
     },
     onSettled: () => {
-      if (sessionId) {
-        void queryClient.invalidateQueries({
-          queryKey: queryKeys.cart.items(sessionId),
-        });
-      }
+      void queryClient.invalidateQueries({ queryKey: cartKey });
     },
   });
 
@@ -170,32 +137,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       size: string;
       qty: number;
     }) => {
-      if (!sessionId) return;
       if (qty <= 0) {
-        await supabase
-          .from("cart_items")
-          .delete()
-          .eq("session_id", sessionId)
-          .eq("product_id", productId)
-          .eq("color_name", color)
-          .eq("size", size);
+        removeLine(productId, color, size);
       } else {
-        await supabase
-          .from("cart_items")
-          .update({ quantity: qty })
-          .eq("session_id", sessionId)
-          .eq("product_id", productId)
-          .eq("color_name", color)
-          .eq("size", size);
+        setLineQuantity(productId, color, size, qty);
       }
     },
     onMutate: async ({ productId, color, size, qty }) => {
-      if (!sessionId) return;
-      const key = queryKeys.cart.items(sessionId);
-      await queryClient.cancelQueries({ queryKey: key });
-      const previous = queryClient.getQueryData<CartItem[]>(key) ?? [];
+      await queryClient.cancelQueries({ queryKey: cartKey });
+      const previous = queryClient.getQueryData<CartItem[]>(cartKey) ?? [];
 
-      queryClient.setQueryData<CartItem[]>(key, (old = []) => {
+      queryClient.setQueryData<CartItem[]>(cartKey, (old = []) => {
         if (qty <= 0) {
           return old.filter(
             (i) =>
@@ -218,50 +170,43 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       return { previous };
     },
     onError: (_err, _vars, context) => {
-      if (!sessionId || !context) return;
-      queryClient.setQueryData(queryKeys.cart.items(sessionId), context.previous);
+      if (context) {
+        queryClient.setQueryData(cartKey, context.previous);
+      }
     },
     onSettled: () => {
-      if (sessionId) {
-        void queryClient.invalidateQueries({
-          queryKey: queryKeys.cart.items(sessionId),
-        });
-      }
+      void queryClient.invalidateQueries({ queryKey: cartKey });
     },
   });
 
   const clearCartMutation = useMutation({
     mutationFn: async () => {
-      if (!sessionId) return;
-      await supabase
-        .from("cart_items")
-        .delete()
-        .eq("session_id", sessionId);
+      clearLines();
     },
     onMutate: async () => {
-      if (!sessionId) return;
-      const key = queryKeys.cart.items(sessionId);
-      await queryClient.cancelQueries({ queryKey: key });
-      const previous = queryClient.getQueryData<CartItem[]>(key) ?? [];
-      queryClient.setQueryData<CartItem[]>(key, []);
+      await queryClient.cancelQueries({ queryKey: cartKey });
+      const previous = queryClient.getQueryData<CartItem[]>(cartKey) ?? [];
+      queryClient.setQueryData<CartItem[]>(cartKey, []);
       return { previous };
     },
     onError: (_err, _vars, context) => {
-      if (!sessionId || !context) return;
-      queryClient.setQueryData(queryKeys.cart.items(sessionId), context.previous);
+      if (context) {
+        queryClient.setQueryData(cartKey, context.previous);
+      }
     },
     onSettled: () => {
-      if (sessionId) {
-        void queryClient.invalidateQueries({
-          queryKey: queryKeys.cart.items(sessionId),
-        });
-      }
+      void queryClient.invalidateQueries({ queryKey: cartKey });
     },
   });
 
   const addItem = useCallback(
-    (product: Product, color: ProductColor, size: string) => {
-      addItemMutation.mutate({ product, color, size });
+    (
+      product: Product,
+      color: ProductColor,
+      size: string,
+      quantity = 1
+    ) => {
+      addItemMutation.mutate({ product, color, size, quantity });
     },
     [addItemMutation]
   );

@@ -58,6 +58,14 @@ export interface Product {
   created_at?: string;
 }
 
+export interface CartLineRef {
+  productId: string;
+  colorName: string;
+  colorHex: string;
+  size: string;
+  quantity: number;
+}
+
 export interface CartItem {
   product: Product;
   quantity: number;
@@ -68,7 +76,12 @@ export interface CartItem {
 export interface CartState {
   items: CartItem[];
   isLoading: boolean;
-  addItem: (product: Product, color: ProductColor, size: string) => void;
+  addItem: (
+    product: Product,
+    color: ProductColor,
+    size: string,
+    quantity?: number
+  ) => void;
   removeItem: (productId: string, color: string, size: string) => void;
   updateQty: (productId: string, color: string, size: string, qty: number) => void;
   clearCart: () => void;
@@ -119,11 +132,6 @@ export interface OrderItem {
 /** Pedido del cliente con líneas cargadas desde `order_items`. */
 export interface OrderWithItems extends Order {
   items: OrderItem[];
-}
-
-export interface CartSession {
-  id: string;
-  created_at: string;
 }
 
 export interface Profile {

@@ -28,8 +28,7 @@ export const queryKeys = {
     current: () => ["profiles", "current"] as const,
   },
   cart: {
-    session: () => ["cart", "session"] as const,
-    items: (sessionId: string) => ["cart", "items", sessionId] as const,
+    hydrated: () => ["cart", "hydrated"] as const,
   },
   auth: {
     user: () => ["auth", "user"] as const,

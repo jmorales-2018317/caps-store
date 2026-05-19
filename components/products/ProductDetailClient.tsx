@@ -14,7 +14,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
-import { Badge } from "@/components/ui/Badge";
+import { ProductBadge } from "@/components/ui/product-badge";
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/products/ProductCard";
 import { getProductCardBadges } from "@/lib/product-badges";
@@ -77,7 +77,7 @@ export function ProductDetailClient({ productId }: ProductDetailClientProps) {
   const activeSize = selectedSize ?? p.sizes[0];
 
   function handleAddToCart() {
-    addItem(p!, activeColor, activeSize);
+    addItem(p!, activeColor, activeSize, quantity);
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);
   }
@@ -128,7 +128,7 @@ export function ProductDetailClient({ productId }: ProductDetailClientProps) {
             {detailBadges.length > 0 ? (
               <div className="absolute top-4 left-4 flex flex-col gap-1.5">
                 {detailBadges.map((b) => (
-                  <Badge key={b.key} type={b.type} />
+                  <ProductBadge key={b.key} type={b.type} />
                 ))}
               </div>
             ) : null}

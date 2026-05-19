@@ -33,7 +33,7 @@ export function CartItem({ item }: CartItemProps) {
 
   return (
     <Card
-      className={cn("gap-0 overflow-hidden border-border py-0 transition-opacity duration-300", {
+      className={cn("gap-0 overflow-hidden py-0 transition-opacity duration-300", {
         "opacity-50": isRemoving,
       })}
     >
@@ -54,25 +54,15 @@ export function CartItem({ item }: CartItemProps) {
         <div className="flex-1 p-4">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-[0.2em]">
-                {product.hat_style.label}
-              </p>
               <Link
                 href={`/products/${product.id}`}
-                className="text-foreground mt-0.5 block text-lg font-medium hover:text-accent transition-colors"
+                className="text-foreground block text-lg font-medium hover:text-accent transition-colors"
               >
-                {product.name}
+                <h3>{product.name}</h3>
               </Link>
-              <p className="text-muted-foreground mt-1 flex items-center gap-1.5 text-sm">
-                <span
-                  className="inline-block size-3 shrink-0 rounded-full border border-border"
-                  style={{ backgroundColor: selectedColor.hex }}
-                  aria-hidden
-                />
-                <span>
-                  {selectedColor.name}
-                  {selectedSize ? ` • ${selectedSize}` : ""}
-                </span>
+              <p className="text-muted-foreground mt-1 text-sm">
+                {selectedColor.name}
+                {selectedSize ? ` • ${selectedSize}` : ""}
               </p>
             </div>
             <Button
@@ -139,7 +129,7 @@ export function CartItem({ item }: CartItemProps) {
         </div>
       </div>
 
-      <CardFooter className="bg-muted/20 border-t border-border px-4 py-2!">
+      <CardFooter className="border-t bg-muted/20 px-4 py-2!">
         <div className="text-muted-foreground flex items-center text-sm">
           <Package className="me-2 size-4 shrink-0" />
           <span>Entrega estimada: 3–5 días hábiles</span>

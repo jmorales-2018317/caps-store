@@ -122,7 +122,7 @@ export function Navbar() {
               </Link>
 
               <Link
-                href="/cart?tab=cart"
+                href="/cart"
                 className={cn(
                   "relative flex items-center justify-center w-9 h-9 text-muted hover:text-text transition-colors duration-200",
                   cartBump && "animate-pop"
@@ -138,7 +138,7 @@ export function Navbar() {
               </Link>
 
               <Link
-                href="/cart?tab=orders"
+                href="/orders"
                 className="hidden sm:flex items-center justify-center w-9 h-9 text-muted hover:text-text transition-colors duration-200"
                 aria-label="Mis pedidos"
                 title="Mis pedidos"
@@ -244,7 +244,7 @@ export function Navbar() {
               </Link>
             ))}
             <Link
-              href="/cart?tab=orders"
+              href="/orders"
               className="text-sm font-bold uppercase tracking-[0.2em] text-muted hover:text-text transition-colors duration-200"
             >
               Pedidos

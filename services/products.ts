@@ -28,6 +28,30 @@ export async function getProducts(
   return ((data ?? []) as ProductRow[]).map(mapProductRow);
 }
 
+export async function getProductsByIds(
+  supabase: SupabaseClient,
+  ids: string[]
+): Promise<Product[]> {
+  const uniqueIds = [...new Set(ids)];
+  if (uniqueIds.length === 0) return [];
+
+  const { data, error } = await supabase
+    .from("products")
+    .select(PRODUCT_SELECT)
+    .in("id", uniqueIds);
+
+  if (error) throw new Error(error.message);
+
+  const byId = new Map(
+    ((data ?? []) as ProductRow[]).map((row) => [row.id, mapProductRow(row)])
+  );
+
+  return uniqueIds.flatMap((id) => {
+    const product = byId.get(id);
+    return product ? [product] : [];
+  });
+}
+
 export async function getProductById(
   supabase: SupabaseClient,
   id: string

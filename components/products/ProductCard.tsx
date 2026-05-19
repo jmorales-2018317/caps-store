@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ShoppingBag, Star } from "lucide-react";
-import { Badge } from "@/components/ui/Badge";
+import { ProductBadge } from "@/components/ui/product-badge";
 import { useCart } from "@/context/CartContext";
 import { getProductCardBadges } from "@/lib/product-badges";
 import { formatPrice } from "@/lib/utils";
@@ -48,7 +48,7 @@ export function ProductCard({ product }: ProductCardProps) {
         {cardBadges.length > 0 ? (
           <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5">
             {cardBadges.map((b) => (
-              <Badge key={b.key} type={b.type} />
+              <ProductBadge key={b.key} type={b.type} />
             ))}
           </div>
         ) : null}

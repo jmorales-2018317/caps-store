@@ -16,6 +16,10 @@ export default async function HomePage() {
 
   await Promise.all([
     queryClient.prefetchQuery({
+      queryKey: queryKeys.products.list({ limit: 4 }),
+      queryFn: () => getProducts(supabase, { limit: 4 }),
+    }),
+    queryClient.prefetchQuery({
       queryKey: queryKeys.products.featured(),
       queryFn: () => getProducts(supabase, { featured: true, limit: 8 }),
     }),

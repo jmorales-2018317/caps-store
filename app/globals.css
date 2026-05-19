@@ -274,3 +274,20 @@ body {
     @apply font-sans;
   }
 }
+
+/* Dashboard template: sidebar "none" mode */
+.sidebar-none-mode [data-slot="sidebar"] {
+  height: 100vh !important;
+  min-height: 100vh !important;
+}
+
+@media (min-width: 768px) {
+  [data-side="right"][data-variant="inset"] ~ [data-slot="sidebar-inset"] {
+    margin-right: 0 !important;
+  }
+
+  [data-side="right"][data-variant="inset"][data-state="collapsed"]
+    ~ [data-slot="sidebar-inset"] {
+    margin-right: 0.5rem !important;
+  }
+}

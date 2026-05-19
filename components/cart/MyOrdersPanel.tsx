@@ -115,11 +115,11 @@ export function MyOrdersPanel() {
         title="Entra para ver tus pedidos"
         description="Asociamos cada compra a tu cuenta para que puedas revisar el estado del envío y el total en un solo lugar."
         primaryAction={{
-          href: `/login?redirect=${encodeURIComponent("/cart?tab=orders")}`,
+          href: `/login?redirect=${encodeURIComponent("/orders")}`,
           label: "Iniciar sesión",
         }}
         secondaryAction={{
-          href: `/signup?redirect=${encodeURIComponent("/cart?tab=orders")}`,
+          href: `/signup?redirect=${encodeURIComponent("/orders")}`,
           label: "Crear cuenta",
         }}
       />

@@ -25,7 +25,9 @@ const useCurrentUser = (options?: Options) => {
       void queryClient.invalidateQueries({
         queryKey: queryKeys.profiles.current(),
       });
-      void queryClient.invalidateQueries({ queryKey: ["cart"] });
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.cart.hydrated(),
+      });
     });
 
     return () => subscription.unsubscribe();
