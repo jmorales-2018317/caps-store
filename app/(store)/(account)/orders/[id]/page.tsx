@@ -180,7 +180,7 @@ export default async function OrderDetailPage({
                         </p>
                       </div>
                     </div>
-                    <p className="shrink-0 text-sm font-semibold tabular-nums text-foreground pl-[calc(4rem+0.75rem)] sm:pl-0">
+                    <p className="shrink-0 text-sm font-semibold tabular-nums text-foreground pl-19 sm:pl-0">
                       {formatPriceDecimal(lineTotal)}
                     </p>
                   </li>
