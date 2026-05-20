@@ -4,25 +4,30 @@ import { ORDER_STATUSES, type OrderStatus } from "@/lib/order-status";
 export type { OrderStatus } from "@/lib/order-status";
 export { normalizeOrderStatus } from "@/lib/order-status";
 
+/** Estilo tipo píldora monocromático (referencia pedidos / estados claros). */
 export const ORDER_STATUS_BADGE_CONFIG: Record<
   OrderStatus,
   { label: string; className: string }
 > = {
   pending: {
     label: "Pendiente",
-    className: "bg-yellow-500/15 text-yellow-400 border-yellow-500/30",
+    className:
+      "bg-muted text-foreground border-transparent dark:bg-muted dark:text-foreground",
   },
   shipped: {
     label: "Enviado",
-    className: "bg-purple-500/15 text-purple-400 border-purple-500/30",
+    className:
+      "bg-muted text-foreground border-transparent dark:bg-muted dark:text-foreground",
   },
   delivered: {
     label: "Entregado",
-    className: "bg-green-500/15 text-green-400 border-green-500/30",
+    className:
+      "bg-foreground text-background border-transparent dark:bg-foreground dark:text-background",
   },
   cancelled: {
     label: "Cancelado",
-    className: "bg-red-500/15 text-red-400 border-red-500/30",
+    className:
+      "bg-background text-muted-foreground border-border dark:bg-background dark:text-muted-foreground",
   },
 };
 
@@ -43,13 +48,13 @@ type OrderStatusBadgeProps = {
 export function OrderStatusBadge({ status, className }: OrderStatusBadgeProps) {
   const cfg = ORDER_STATUS_BADGE_CONFIG[status] ?? {
     label: status,
-    className: "bg-surface-2 text-muted border-border",
+    className: "bg-muted text-foreground border-transparent",
   };
 
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide",
+        "inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold tracking-normal",
         cfg.className,
         className
       )}

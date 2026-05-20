@@ -1,0 +1,79 @@
+[
+  {
+    "id": 1,
+    "orderId": "ORD-2026-001",
+    "orderDate": "2026-07-14",
+    "customerName": "John Doe",
+    "customerAddress": "123 Main St, New York, NY 10001",
+    "status": "Delivered",
+    "itemCount": 3,
+    "total": 129.99,
+    "paymentMethod": "Credit Card"
+  },
+  {
+    "id": 2,
+    "orderId": "ORD-2026-002",
+    "orderDate": "2026-07-12",
+    "customerName": "Jane Smith",
+    "customerAddress": "456 Oak Ave, Los Angeles, CA 90001",
+    "status": "Shipped",
+    "itemCount": 1,
+    "total": 49.5,
+    "paymentMethod": "PayPal"
+  },
+  {
+    "id": 3,
+    "orderId": "ORD-2026-003",
+    "orderDate": "2026-07-11",
+    "customerName": "Alex Rivera",
+    "customerAddress": "789 Pine Rd, Chicago, IL 60601",
+    "status": "Processing",
+    "itemCount": 5,
+    "total": 312.0,
+    "paymentMethod": "Credit Card"
+  },
+  {
+    "id": 4,
+    "orderId": "ORD-2026-004",
+    "orderDate": "2026-07-10",
+    "customerName": "Sam Lee",
+    "customerAddress": "12 Market St, San Francisco, CA 94102",
+    "status": "Cancelled",
+    "itemCount": 2,
+    "total": 89.0,
+    "paymentMethod": "PayPal"
+  },
+  {
+    "id": 5,
+    "orderId": "ORD-2026-005",
+    "orderDate": "2026-07-09",
+    "customerName": "Maria Garcia",
+    "customerAddress": "99 Elm Blvd, Austin, TX 78701",
+    "status": "Delivered",
+    "itemCount": 1,
+    "total": 24.99,
+    "paymentMethod": "Credit Card"
+  },
+  {
+    "id": 6,
+    "orderId": "ORD-2026-006",
+    "orderDate": "2026-07-08",
+    "customerName": "Chris Wong",
+    "customerAddress": "200 Harbor Dr, Seattle, WA 98101",
+    "status": "Shipped",
+    "itemCount": 4,
+    "total": 198.45,
+    "paymentMethod": "Credit Card"
+  },
+  {
+    "id": 7,
+    "orderId": "ORD-2026-007",
+    "orderDate": "2026-07-07",
+    "customerName": "Pat Taylor",
+    "customerAddress": "55 Cedar Ln, Denver, CO 80202",
+    "status": "Processing",
+    "itemCount": 2,
+    "total": 67.25,
+    "paymentMethod": "PayPal"
+  }
+]

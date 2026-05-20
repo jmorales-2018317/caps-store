@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { normalizeOrderStatus } from "@/lib/order-status";
+import { getProductsByIds } from "@/services/products";
 import type { Order, OrderItem, OrderWithItems } from "@/types";
 
 type OrderRow = Omit<Order, "contact_phone" | "address" | "city" | "state"> & {
@@ -26,12 +27,34 @@ function mapOrderItemRow(row: Record<string, unknown>): OrderItem {
     order_id: String(row.order_id),
     product_id: String(row.product_id),
     product_name: String(row.product_name),
+    product_image_url:
+      row.product_image_url != null ? String(row.product_image_url) : undefined,
     color_name: row.color_name != null ? String(row.color_name) : undefined,
     color_hex: row.color_hex != null ? String(row.color_hex) : undefined,
     size: row.size != null ? String(row.size) : undefined,
     quantity: Number(row.quantity),
     unit_price: Number(row.unit_price),
   };
+}
+
+async function attachProductImagesToItems(
+  supabase: SupabaseClient,
+  items: OrderItem[]
+): Promise<OrderItem[]> {
+  const missing = items.filter((item) => !item.product_image_url);
+  if (missing.length === 0) return items;
+
+  const productIds = [...new Set(missing.map((item) => item.product_id))];
+  const products = await getProductsByIds(supabase, productIds);
+  const imageByProductId = new Map(
+    products.map((product) => [product.id, product.images[0]] as const)
+  );
+
+  return items.map((item) => {
+    if (item.product_image_url) return item;
+    const url = imageByProductId.get(item.product_id);
+    return url ? { ...item, product_image_url: url } : item;
+  });
 }
 
 export async function getOrders(supabase: SupabaseClient): Promise<Order[]> {
@@ -65,8 +88,11 @@ export async function getOrderById(
 
   if (itemsError) throw new Error(itemsError.message);
 
-  const items = (itemRows ?? []).map((raw) =>
-    mapOrderItemRow(raw as Record<string, unknown>)
+  const items = await attachProductImagesToItems(
+    supabase,
+    (itemRows ?? []).map((raw) =>
+      mapOrderItemRow(raw as Record<string, unknown>)
+    )
   );
 
   return { ...order, items };
@@ -124,9 +150,15 @@ export async function getMyOrders(supabase: SupabaseClient): Promise<OrderWithIt
 
   if (itemsError) throw new Error(itemsError.message);
 
+  const allItems = await attachProductImagesToItems(
+    supabase,
+    (itemRows ?? []).map((raw) =>
+      mapOrderItemRow(raw as Record<string, unknown>)
+    )
+  );
+
   const itemsByOrder = new Map<string, OrderItem[]>();
-  for (const raw of itemRows ?? []) {
-    const item = mapOrderItemRow(raw as Record<string, unknown>);
+  for (const item of allItems) {
     const list = itemsByOrder.get(item.order_id) ?? [];
     list.push(item);
     itemsByOrder.set(item.order_id, list);

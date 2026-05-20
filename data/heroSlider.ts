@@ -1,8 +1,8 @@
 export const heroFeaturedImage = {
-  src: "/cap-model-1.png",
-  alt: "Modelo usando gorra de la colección Crea Caps",
-  width: 2000,
-  height: 3000,
+  src: "/crea-cap.png",
+  alt: "Gorra negra Crea Caps con bordado dorado CREA",
+  width: 1600,
+  height: 1200,
 } as const;
 
 export type HeroFeaturedImage = typeof heroFeaturedImage;

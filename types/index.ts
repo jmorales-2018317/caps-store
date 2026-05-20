@@ -122,6 +122,8 @@ export interface OrderItem {
   order_id: string;
   product_id: string;
   product_name: string;
+  /** Primera imagen del producto (desde `products` o snapshot en `order_items`). */
+  product_image_url?: string;
   color_name?: string;
   color_hex?: string;
   size?: string;

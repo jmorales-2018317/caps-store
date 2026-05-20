@@ -1,14 +1,16 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCart } from "@/context/CartContext";
-import { cn, formatPrice } from "@/lib/utils";
+import { formatPrice } from "@/lib/utils";
 
-const TABS = [
-  { href: "/cart", label: "Carrito" },
-  { href: "/orders", label: "Mis pedidos" },
-] as const;
+function accountPageTitle(pathname: string): string {
+  if (pathname === "/cart") return "Carrito";
+  if (pathname === "/orders" || pathname.startsWith("/orders/")) {
+    return "Mis pedidos";
+  }
+  return "Tu cuenta";
+}
 
 function CartSubtitle() {
   const { items, cartTotal, isLoading } = useCart();
@@ -45,7 +47,7 @@ function AccountSubtitle() {
     return <CartSubtitle />;
   }
 
-  if (pathname === "/orders") {
+  if (pathname === "/orders" || pathname.startsWith("/orders/")) {
     return (
       <p className="text-muted-foreground text-sm">
         Revisa el estado y el detalle de tus compras anteriores
@@ -70,35 +72,10 @@ export function AccountSectionShell({
           Tu cuenta
         </p>
         <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-          Carrito y pedidos
+          {accountPageTitle(pathname)}
         </h1>
         <AccountSubtitle />
       </div>
-
-      <nav
-        className="mx-auto mb-8 flex max-w-md gap-1 border-b border-border"
-        aria-label="Carrito y pedidos"
-      >
-        {TABS.map((tab) => {
-          const isActive = pathname === tab.href;
-
-          return (
-            <Link
-              key={tab.href}
-              href={tab.href}
-              className={cn(
-                "-mb-px flex-1 border-b-2 py-3 text-center text-sm font-semibold transition-colors",
-                isActive
-                  ? "border-primary text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
-              )}
-              aria-current={isActive ? "page" : undefined}
-            >
-              {tab.label}
-            </Link>
-          );
-        })}
-      </nav>
 
       {children}
     </div>

@@ -137,11 +137,6 @@ export default function CartPage() {
                 Ir al pago
               </Link>
             </Button>
-
-            <div className="text-muted-foreground flex items-center justify-center gap-2 text-xs">
-              <CreditCard className="size-3.5 shrink-0" />
-              <span>Pago seguro con cifrado SSL</span>
-            </div>
           </CardContent>
         </Card>
 

@@ -2,67 +2,101 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ShoppingBag } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useStylesWithCount } from "@/hooks/use-styles";
+
+function getTrendingStyleIds(styles: { id: string; count: number }[]) {
+  return new Set(
+    [...styles]
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 3)
+      .map((style) => style.id),
+  );
+}
 
 export function Categories() {
   const { data: hatStyles = [] } = useStylesWithCount();
+  const trendingIds = getTrendingStyleIds(hatStyles);
 
   return (
-    <section className="bg-surface border-y border-border">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-        {/* Header */}
-        <div className="mb-12">
-          <p className="text-[11px] font-black uppercase tracking-[0.3em] text-primary mb-2">
+    <section className="bg-surface border-y border-border py-12 sm:py-16">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-12 text-center">
+          <p className="mb-2 text-[11px] font-black uppercase tracking-[0.3em] text-primary">
             Explora por estilo
           </p>
-          <h2 className="font-black uppercase text-4xl sm:text-5xl tracking-tighter text-text leading-none">
+          <h2 className="text-balance text-3xl font-bold tracking-tight text-text sm:text-4xl">
             Categorías
           </h2>
+          <p className="mt-4 text-lg text-muted-foreground">
+            Descubre gorras en nuestros estilos más populares
+          </p>
         </div>
 
-        {/* Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {hatStyles.map((style) => (
             <Link
               key={style.id}
               href={`/products?style=${style.id}`}
-              className="group relative overflow-hidden bg-surface-2"
-              style={{ aspectRatio: "3/4" }}
+              className="group block"
             >
-              <div className="relative h-full min-h-[200px] sm:min-h-[280px]">
-                {style.image && (
-                  <Image
-                    src={style.image}
-                    alt={style.label}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-60 group-hover:opacity-80"
-                    sizes="(max-width: 640px) 50vw, 25vw"
-                  />
-                )}
+              <Card className="relative cursor-pointer overflow-hidden py-0 transition-all duration-500 hover:shadow-lg">
+                <div className="relative aspect-5/4 overflow-hidden">
+                  {style.image ? (
+                    <Image
+                      src={style.image}
+                      alt={style.label}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
+                  ) : (
+                    <div className="size-full bg-surface-2" />
+                  )}
 
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-linear-to-t from-bg/90 via-bg/20 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent" />
 
-                {/* Content */}
-                <div className="absolute bottom-0 left-0 right-0 p-5">
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-muted mb-1">
-                    {style.count} estilos
-                  </p>
-                  <h3 className="font-black uppercase text-xl tracking-tight text-text leading-none mb-3">
-                    {style.label}
-                  </h3>
-                  <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-primary opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
-                    Ver
-                    <ArrowRight className="w-3 h-3" />
-                  </span>
+                  {trendingIds.has(style.id) ? (
+                    <Badge className="absolute top-4 left-4 rounded-sm px-2.5 py-0.5 font-semibold">
+                      Destacado
+                    </Badge>
+                  ) : null}
+
+                  <div className="absolute right-0 bottom-0 left-0 p-6 text-card-foreground">
+                    <h3 className="mb-1 text-xl font-bold">{style.label}</h3>
+                    <p className="mb-3 text-sm text-card-foreground/60">
+                      {style.description ??
+                        `Gorras y accesorios estilo ${style.label.toLowerCase()}`}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">
+                        {style.count.toLocaleString("es-ES")}{" "}
+                        {style.count === 1 ? "producto" : "productos"}
+                      </span>
+                      <span className="inline-flex h-8 cursor-pointer items-center gap-1 rounded-md border border-white/30 bg-white/20 px-3 text-xs text-white backdrop-blur-sm transition-colors group-hover:bg-white/30">
+                        Ver
+                        <ArrowRight className="size-3.5" />
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Accent line on hover */}
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
-              </div>
+                <div className="absolute right-0 bottom-0 left-0 h-0.5 origin-left scale-x-0 bg-primary transition-transform duration-300 group-hover:scale-x-100" />
+              </Card>
             </Link>
           ))}
+        </div>
+
+        <div className="mt-12 text-center">
+          <Button size="lg" className="h-10 cursor-pointer gap-2 px-4" asChild>
+            <Link href="/products">
+              <ShoppingBag className="size-5" />
+              Ver todas las categorías
+            </Link>
+          </Button>
         </div>
       </div>
     </section>

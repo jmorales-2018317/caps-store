@@ -3,10 +3,10 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Minus, Package, Plus, Trash2 } from "lucide-react";
+import { Minus, Plus, Trash2 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/ui/button";
-import { Card, CardFooter } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { cn, formatPriceDecimal } from "@/lib/utils";
 import type { CartItem as CartItemType } from "@/types";
 
@@ -128,13 +128,6 @@ export function CartItem({ item }: CartItemProps) {
           </div>
         </div>
       </div>
-
-      <CardFooter className="border-t bg-muted/20 px-4 py-2!">
-        <div className="text-muted-foreground flex items-center text-sm">
-          <Package className="me-2 size-4 shrink-0" />
-          <span>Entrega estimada: 3–5 días hábiles</span>
-        </div>
-      </CardFooter>
     </Card>
   );
 }

@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   CheckSquare,
   LayoutTemplate,
+  Package,
   Users,
 } from "lucide-react"
 import Link from "next/link"
@@ -51,6 +52,11 @@ const data = {
           title: "Users",
           url: "/users",
           icon: Users,
+        },
+        {
+          title: "Orders",
+          url: "/admin/orders",
+          icon: Package,
         },
       ],
     },

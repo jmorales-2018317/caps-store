@@ -7,7 +7,9 @@ import {
   Search,
   LayoutDashboard,
   CheckSquare,
+  Package,
   Settings,
+  Users,
   type LucideIcon,
 } from "lucide-react"
 
@@ -120,6 +122,8 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
 
     // Apps
     { title: "Tasks", url: "/tasks", group: "Apps", icon: CheckSquare },
+    { title: "Users", url: "/users", group: "Apps", icon: Users },
+    { title: "Orders", url: "/admin/orders", group: "Apps", icon: Package },
 
     { title: "Cuenta", url: "/settings/account", group: "Cuenta", icon: Settings },
   ]

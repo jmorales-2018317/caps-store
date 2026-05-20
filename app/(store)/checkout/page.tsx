@@ -13,18 +13,36 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowLeft,
-  Lock,
   Check,
   Truck,
   Store,
-  CircleCheck,
   Loader2,
-  User,
+  Shield,
+  Gift,
+  CreditCard,
 } from "lucide-react";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { useCart } from "@/context/CartContext";
-import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { createOrder } from "./actions";
 import type { CheckoutFormData } from "./actions";
 import {
@@ -38,14 +56,23 @@ import { useCurrentProfile } from "@/hooks/use-current-profile";
 import type { Profile } from "@/types";
 import { queryKeys } from "@/lib/query-keys";
 
-type Step = "shipping" | "account" | "confirm";
+type Step = "contact" | "shipping";
 
-const STEP_ORDER: Step[] = ["shipping", "account", "confirm"];
+const STEP_ORDER: Step[] = ["contact", "shipping"];
+const STEP_NUMBER: Record<Step, number> = {
+  contact: 1,
+  shipping: 2,
+};
 
-const labelClass =
-  "block text-[11px] font-bold uppercase tracking-widest text-muted mb-1.5";
+/** Compatibilidad con URLs antiguas (?step=account | confirm) */
+function normalizeCheckoutStepParam(raw: string | null): Step {
+  if (raw === "shipping") return "shipping";
+  if (raw === "contact") return "contact";
+  if (raw === "account" || raw === "confirm") return "contact";
+  return "contact";
+}
 
-const CHECKOUT_ACCOUNT_QUERY = "/checkout?step=account";
+const CHECKOUT_CONTACT_QUERY = "/checkout?step=contact";
 
 function contactFromUserAndProfile(
   user: SupabaseUser | null | undefined,
@@ -75,12 +102,11 @@ function CheckoutFlow() {
   const { data: user, isPending: userLoading } = useCurrentUser();
   const { data: profile, isPending: profileLoading } = useCurrentProfile();
 
-  const loginHref = `/login?redirect=${encodeURIComponent(CHECKOUT_ACCOUNT_QUERY)}`;
-  const signupHref = `/signup?redirect=${encodeURIComponent(CHECKOUT_ACCOUNT_QUERY)}`;
+  const loginHref = `/login?redirect=${encodeURIComponent(CHECKOUT_CONTACT_QUERY)}`;
+  const signupHref = `/signup?redirect=${encodeURIComponent(CHECKOUT_CONTACT_QUERY)}`;
 
-  const stepFromUrl = searchParams.get("step") as Step | null;
-  const initialStep =
-    stepFromUrl && STEP_ORDER.includes(stepFromUrl) ? stepFromUrl : "shipping";
+  const stepFromUrl = normalizeCheckoutStepParam(searchParams.get("step"));
+  const initialStep = STEP_ORDER.includes(stepFromUrl) ? stepFromUrl : "contact";
 
   const [step, setStepState] = useState<Step>(initialStep);
   const [placedOrderId, setPlacedOrderId] = useState<string | null>(null);
@@ -89,8 +115,8 @@ function CheckoutFlow() {
   const [contactPhone, setContactPhone] = useState("");
 
   useEffect(() => {
-    const s = searchParams.get("step") as Step | null;
-    if (s && STEP_ORDER.includes(s)) setStepState(s);
+    const s = normalizeCheckoutStepParam(searchParams.get("step"));
+    if (STEP_ORDER.includes(s)) setStepState(s);
   }, [searchParams]);
 
   useEffect(() => {
@@ -122,7 +148,7 @@ function CheckoutFlow() {
   const shippingCost =
     shipping.fulfillment === "pickup" ? 0 : CHECKOUT_SHIPPING_FEE_GTQ;
   const total = cartTotal + shippingCost;
-  const currentIdx = STEP_ORDER.indexOf(step);
+  const currentStepNumber = STEP_NUMBER[step];
 
   const contactParts = useMemo(
     () => contactFromUserAndProfile(user ?? undefined, profile ?? undefined),
@@ -151,24 +177,19 @@ function CheckoutFlow() {
     return null;
   }
 
-  function goToAccount() {
-    const err = validateShipping();
-    if (err) {
-      setSubmitError(err);
-      return;
-    }
-    setSubmitError(null);
-    setStep("account");
-  }
-
-  function goToConfirm() {
+  function goToShipping() {
     const err = validateAccount();
     if (err) {
       setSubmitError(err);
       return;
     }
     setSubmitError(null);
-    setStep("confirm");
+    setStep("shipping");
+  }
+
+  function prevStep() {
+    setSubmitError(null);
+    if (step === "shipping") setStep("contact");
   }
 
   async function handlePlaceOrder(e: React.FormEvent) {
@@ -187,14 +208,14 @@ function CheckoutFlow() {
     const accErr = validateAccount();
     if (accErr) {
       setSubmitError(accErr);
-      setStep("account");
+      setStep("contact");
       setSubmitting(false);
       return;
     }
 
     if (!contactParts) {
       setSubmitError("No se pudieron leer los datos de tu perfil.");
-      setStep("account");
+      setStep("contact");
       setSubmitting(false);
       return;
     }
@@ -227,33 +248,37 @@ function CheckoutFlow() {
   if (placedOrderId) {
     const shortId = placedOrderId.slice(0, 8).toUpperCase();
     return (
-      <div className="max-w-xl mx-auto px-4 py-32 text-center">
-        <div className="w-16 h-16 bg-primary flex items-center justify-center mx-auto mb-8">
-          <Check className="w-8 h-8 text-bg" />
+      <div className="bg-muted/30">
+        <div className="mx-auto max-w-xl px-4 py-32 text-center">
+          <div className="mx-auto mb-8 flex size-16 items-center justify-center rounded-full bg-primary">
+            <Check className="size-8 text-primary-foreground" />
+          </div>
+          <h1 className="mb-4 text-3xl font-bold text-balance">
+            ¡Pedido confirmado!
+          </h1>
+          <p className="mb-10 text-sm leading-relaxed text-muted-foreground">
+            Gracias por tu compra. Hemos recibido tu pedido y lo estamos
+            preparando. Recibirás un correo de confirmación en breve.
+          </p>
+          <p className="mb-8 text-xs tracking-widest text-muted-foreground uppercase">
+            Pedido #{shortId}
+          </p>
+          <Button size="lg" asChild>
+            <Link href="/products">Seguir comprando</Link>
+          </Button>
         </div>
-        <h1 className="font-black uppercase text-3xl tracking-tighter text-text mb-4">
-          ¡Pedido confirmado!
-        </h1>
-        <p className="text-sm text-muted mb-10 leading-relaxed">
-          Gracias por tu compra. Hemos recibido tu pedido y lo estamos
-          preparando. Recibirás un correo de confirmación en breve.
-        </p>
-        <p className="text-[11px] uppercase tracking-widest text-faint mb-8">
-          Pedido #{shortId}
-        </p>
-        <Button size="lg" asChild>
-          <Link href="/products">Seguir comprando</Link>
-        </Button>
       </div>
     );
   }
 
   if (cartLoading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-24">
-        <div className="flex items-center gap-3 text-muted">
-          <Loader2 className="w-5 h-5 animate-spin" />
-          <span className="text-sm">Cargando tu carrito…</span>
+      <div className="bg-muted/30">
+        <div className="mx-auto max-w-7xl px-4 py-24">
+          <div className="flex items-center gap-3 text-muted-foreground">
+            <Loader2 className="size-5 animate-spin" />
+            <span className="text-sm">Cargando tu carrito…</span>
+          </div>
         </div>
       </div>
     );
@@ -261,612 +286,532 @@ function CheckoutFlow() {
 
   if (items.length === 0) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-24">
-        <div className="flex flex-col items-center gap-3 text-muted">
-          <Loader2 className="w-6 h-6 animate-spin" />
-          <span className="text-sm">Volviendo al carrito…</span>
+      <div className="bg-muted/30">
+        <div className="mx-auto max-w-7xl px-4 py-24">
+          <div className="flex flex-col items-center gap-3 text-muted-foreground">
+            <Loader2 className="size-6 animate-spin" />
+            <span className="text-sm">Volviendo al carrito…</span>
+          </div>
         </div>
       </div>
     );
   }
 
-  const steps: { id: Step; label: string; icon: React.ReactNode }[] = [
-    { id: "shipping", label: "Envío", icon: <Truck className="w-3 h-3" /> },
-    { id: "account", label: "Tu cuenta", icon: <User className="w-3 h-3" /> },
-    {
-      id: "confirm",
-      label: "Confirmación",
-      icon: <CircleCheck className="w-3 h-3" />,
-    },
-  ];
-
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <Link
-        href="/cart"
-        className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-muted hover:text-text transition-colors mb-10"
-      >
-        <ArrowLeft className="w-3 h-3" />
-        Volver al carrito
-      </Link>
+    <div className="bg-muted/30">
+      <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <Link
+          href="/cart"
+          className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ArrowLeft className="size-4" />
+          Volver al carrito
+        </Link>
 
-      <div className="mb-10">
-        <p className="text-[11px] font-black uppercase tracking-[0.3em] text-primary mb-1">
-          Checkout
-        </p>
-        <h1 className="font-black uppercase text-4xl sm:text-5xl tracking-tighter text-text leading-none">
-          Finalizar compra
-        </h1>
-      </div>
-
-      <div className="flex items-center gap-0 mb-12 max-w-md">
-        {steps.map((s, i) => (
-          <div key={s.id} className="flex items-center">
-            <button
-              type="button"
-              onClick={() =>
-                STEP_ORDER.indexOf(s.id) <= currentIdx && setStep(s.id)
-              }
-              className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-colors ${step === s.id
-                ? "text-text"
-                : STEP_ORDER.indexOf(s.id) < currentIdx
-                  ? "text-primary"
-                  : "text-faint"
-                }`}
-            >
-              <div
-                className={`w-6 h-6 flex items-center justify-center border ${step === s.id
-                  ? "border-text bg-text text-bg"
-                  : STEP_ORDER.indexOf(s.id) < currentIdx
-                    ? "border-primary bg-primary text-bg"
-                    : "border-faint"
-                  }`}
-              >
-                {STEP_ORDER.indexOf(s.id) < currentIdx ? (
-                  <Check className="w-3 h-3" />
-                ) : (
-                  s.icon
-                )}
-              </div>
-              <span className="hidden sm:block">{s.label}</span>
-            </button>
-            {i < steps.length - 1 && (
-              <div
-                className={`w-8 h-px mx-2 ${STEP_ORDER.indexOf(s.id) < currentIdx
-                  ? "bg-primary"
-                  : "bg-border"
-                  }`}
-              />
-            )}
-          </div>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-        <div className="lg:col-span-2">
-          <form onSubmit={handlePlaceOrder} noValidate>
-            {step === "shipping" && (
-              <div className="space-y-5">
-                <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-text mb-6 pb-3 border-b border-border">
-                  Entrega
-                </h2>
-                {submitError && (
-                  <p
-                    className="text-sm text-red-500 border border-red-500/30 bg-red-500/10 px-4 py-3"
-                    role="alert"
-                  >
-                    {submitError}
-                  </p>
-                )}
-
-                <fieldset className="space-y-3 border-0 p-0 m-0">
-                  <legend className={`${labelClass} mb-3`}>
-                    ¿Cómo recibes tu pedido?
-                  </legend>
-                  <div className="space-y-2">
-                    <label
-                      className={cn(
-                        "flex items-center justify-between p-4 border border-border cursor-pointer hover:border-muted transition-colors",
-                        shipping.fulfillment === "pickup" && "border-text"
-                      )}
-                    >
-                      <div className="flex items-center gap-3">
-                        <input
-                          type="radio"
-                          name="fulfillment"
-                          value="pickup"
-                          checked={shipping.fulfillment === "pickup"}
-                          onChange={() =>
-                            setShipping((s) => ({
-                              ...s,
-                              fulfillment: "pickup",
-                            }))
-                          }
-                          className="accent-primary"
-                        />
-                        <Store className="w-4 h-4 text-muted shrink-0" />
-                        <div>
-                          <p className="text-xs font-bold text-text">
-                            Recoger en tienda
-                          </p>
-                          <p className="text-[11px] text-muted">
-                            Sin datos de domicilio · Sin costo de envío
-                          </p>
-                        </div>
-                      </div>
-                      <span className="text-sm font-bold text-text">
-                        {formatPrice(0)}
-                      </span>
-                    </label>
-                    <label
-                      className={cn(
-                        "flex items-center justify-between p-4 border border-border cursor-pointer hover:border-muted transition-colors",
-                        shipping.fulfillment === "delivery" && "border-text"
-                      )}
-                    >
-                      <div className="flex items-center gap-3">
-                        <input
-                          type="radio"
-                          name="fulfillment"
-                          value="delivery"
-                          checked={shipping.fulfillment === "delivery"}
-                          onChange={() =>
-                            setShipping((s) => ({
-                              ...s,
-                              fulfillment: "delivery",
-                            }))
-                          }
-                          className="accent-primary"
-                        />
-                        <Truck className="w-4 h-4 text-muted shrink-0" />
-                        <div>
-                          <p className="text-xs font-bold text-text">
-                            Envío a domicilio
-                          </p>
-                          <p className="text-[11px] text-muted">
-                            Entrega en tu dirección
-                          </p>
-                        </div>
-                      </div>
-                      <span className="text-sm font-bold text-text">
-                        {formatPriceDecimal(CHECKOUT_SHIPPING_FEE_GTQ)}
-                      </span>
-                    </label>
-                  </div>
-                </fieldset>
-
-                {shipping.fulfillment === "delivery" && (
-                  <div className="space-y-5 pt-2 border-t border-border">
-                    <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-text pt-2">
-                      Dirección de envío
-                    </h3>
-                    <div>
-                      <label htmlFor="shipping-address" className={labelClass}>
-                        Dirección línea 1
-                      </label>
-                      <Input
-                        id="shipping-address"
-                        name="address"
-                        autoComplete="street-address"
-                        placeholder="Calle Principal 123"
-                        value={shipping.address}
-                        onChange={(e) =>
-                          setShipping((s) => ({
-                            ...s,
-                            address: e.target.value,
-                          }))
-                        }
-                        required={shipping.fulfillment === "delivery"}
-                        aria-required={
-                          shipping.fulfillment === "delivery" || undefined
-                        }
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="shipping-address2" className={labelClass}>
-                        Dirección línea 2{" "}
-                        <span className="font-normal normal-case tracking-normal text-faint">
-                          (opcional)
-                        </span>
-                      </label>
-                      <Input
-                        id="shipping-address2"
-                        name="address2"
-                        autoComplete="address-line2"
-                        placeholder="Depto., interior, referencia"
-                        value={shipping.address2}
-                        onChange={(e) =>
-                          setShipping((s) => ({
-                            ...s,
-                            address2: e.target.value,
-                          }))
-                        }
-                      />
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                      <div>
-                        <label htmlFor="shipping-city" className={labelClass}>
-                          Ciudad
-                        </label>
-                        <Input
-                          id="shipping-city"
-                          name="city"
-                          autoComplete="address-level2"
-                          placeholder="Ciudad de Guatemala"
-                          value={shipping.city}
-                          onChange={(e) =>
-                            setShipping((s) => ({
-                              ...s,
-                              city: e.target.value,
-                            }))
-                          }
-                          required={shipping.fulfillment === "delivery"}
-                          aria-required={
-                            shipping.fulfillment === "delivery" || undefined
-                          }
-                        />
-                      </div>
-                      <div>
-                        <label htmlFor="shipping-state" className={labelClass}>
-                          Departamento / municipio
-                        </label>
-                        <Input
-                          id="shipping-state"
-                          name="state"
-                          autoComplete="address-level1"
-                          placeholder="Guatemala"
-                          value={shipping.state}
-                          onChange={(e) =>
-                            setShipping((s) => ({
-                              ...s,
-                              state: e.target.value,
-                            }))
-                          }
-                          required={shipping.fulfillment === "delivery"}
-                          aria-required={
-                            shipping.fulfillment === "delivery" || undefined
-                          }
-                        />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                      <div>
-                        <label
-                          htmlFor="shipping-postalCode"
-                          className={labelClass}
-                        >
-                          Código postal
-                        </label>
-                        <Input
-                          id="shipping-postalCode"
-                          name="postalCode"
-                          autoComplete="postal-code"
-                          placeholder="01010"
-                          value={shipping.postalCode}
-                          onChange={(e) =>
-                            setShipping((s) => ({
-                              ...s,
-                              postalCode: e.target.value,
-                            }))
-                          }
-                          required={shipping.fulfillment === "delivery"}
-                          aria-required={
-                            shipping.fulfillment === "delivery" || undefined
-                          }
-                        />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="shipping-country"
-                          className={labelClass}
-                        >
-                          País
-                        </label>
-                        <select
-                          id="shipping-country"
-                          name="country"
-                          autoComplete="country-name"
-                          value={shipping.country}
-                          onChange={(e) =>
-                            setShipping((s) => ({
-                              ...s,
-                              country: e.target.value,
-                            }))
-                          }
-                          className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm dark:bg-input/30"
-                        >
-                          <option>Guatemala</option>
-                          <option>México</option>
-                          <option>Estados Unidos</option>
-                          <option>Colombia</option>
-                          <option>Argentina</option>
-                          <option>España</option>
-                          <option>Chile</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                <div className="pt-2">
-                  <Button type="button" size="lg" onClick={goToAccount}>
-                    Continuar
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {step === "account" && (
-              <div className="space-y-5">
-                <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-text mb-6 pb-3 border-b border-border">
-                  Tu cuenta
-                </h2>
-                <p className="text-sm text-muted leading-relaxed">
-                  Usamos el nombre y el correo de tu perfil para el pedido. Solo
-                  necesitamos un teléfono de contacto.
-                </p>
-
-                {submitError && (
-                  <p
-                    className="text-sm text-red-500 border border-red-500/30 bg-red-500/10 px-4 py-3"
-                    role="alert"
-                  >
-                    {submitError}
-                  </p>
-                )}
-
-                {userLoading ? (
-                  <div className="flex items-center gap-3 py-12 text-muted">
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    <span className="text-sm">Comprobando sesión…</span>
-                  </div>
-                ) : !user ? (
-                  <div className="space-y-6 border border-border bg-surface-2 p-8">
-                    <p className="text-sm text-text leading-relaxed">
-                      Para continuar con tu pedido debes iniciar sesión. Así
-                      podremos asociar la compra a tu cuenta y usar tus datos
-                      de perfil.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-3">
-                      <Button size="lg" asChild>
-                        <Link href={loginHref}>Iniciar sesión</Link>
-                      </Button>
-                      <Button size="lg" variant="outline" asChild>
-                        <Link href={signupHref}>Crear cuenta</Link>
-                      </Button>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSubmitError(null);
-                        setStep("shipping");
-                      }}
-                      className="text-[11px] font-bold uppercase tracking-widest text-muted hover:text-text transition-colors"
-                    >
-                      ← Volver a envío
-                    </button>
-                  </div>
-                ) : !accountReady ? (
-                  <div className="flex items-center gap-3 py-12 text-muted">
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    <span className="text-sm">Cargando tu perfil…</span>
-                  </div>
-                ) : (
-                  <>
-                    <div className="space-y-4 border border-border p-5 bg-surface-2">
-                      <div>
-                        <p className={labelClass}>Nombre (desde tu perfil)</p>
-                        <p className="text-sm font-medium text-text">
-                          {contactParts!.firstName} {contactParts!.lastName}
-                        </p>
-                      </div>
-                      <div>
-                        <p className={labelClass}>
-                          Correo electrónico (desde tu cuenta)
-                        </p>
-                        <p className="text-sm font-medium text-text break-all">
-                          {contactParts!.email}
-                        </p>
-                      </div>
-                    </div>
-                    <div>
-                      <label htmlFor="checkout-phone" className={labelClass}>
-                        Teléfono de contacto
-                      </label>
-                      <Input
-                        id="checkout-phone"
-                        name="phone"
-                        type="tel"
-                        autoComplete="tel"
-                        placeholder="+502 5555 0000"
-                        value={contactPhone}
-                        onChange={(e) => setContactPhone(e.target.value)}
-                        required
-                        aria-required
-                      />
-                      <p className="text-[11px] text-muted mt-1.5">
-                        Lo usamos solo para coordinar la entrega o recogida.
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3 pt-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSubmitError(null);
-                          setStep("shipping");
-                        }}
-                        className="text-[11px] font-bold uppercase tracking-widest text-muted hover:text-text transition-colors"
-                      >
-                        ← Atrás
-                      </button>
-                      <Button type="button" size="lg" onClick={goToConfirm}>
-                        Continuar a confirmación
-                      </Button>
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
-
-            {step === "confirm" && (
-              <div className="space-y-5">
-                <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-text mb-6 pb-3 border-b border-border">
-                  Confirmar pedido
-                </h2>
-                <p className="text-sm text-muted leading-relaxed">
-                  El cobro con tarjeta u otro método se conectará aquí próximamente.
-                  Al confirmar se registra tu pedido con el total indicado.
-                </p>
-
-                <div className="bg-surface-2 border border-border p-5 space-y-3 text-sm">
-                  <div className="flex justify-between gap-4">
-                    <span className="text-muted">Contacto</span>
-                    <span className="font-bold text-text text-right">
-                      {contactParts?.firstName} {contactParts?.lastName}
-                      <br />
-                      <span className="font-normal text-muted text-xs">
-                        {contactParts?.email}
-                      </span>
-                      <br />
-                      <span className="font-normal text-muted text-xs">
-                        {contactPhone}
-                      </span>
-                    </span>
-                  </div>
-                  <div className="flex justify-between gap-4 pt-2 border-t border-border">
-                    <span className="text-muted">Entrega</span>
-                    <span className="font-bold text-text text-right">
-                      {shipping.fulfillment === "pickup" ? (
-                        "Recoger en tienda"
-                      ) : (
-                        <>
-                          Envío a domicilio
-                          <br />
-                          <span className="font-normal text-muted text-xs">
-                            {shipping.address}
-                            {shipping.address2
-                              ? `, ${shipping.address2}`
-                              : ""}
-                            <br />
-                            {shipping.city}, {shipping.state}{" "}
-                            {shipping.postalCode}
-                            <br />
-                            {shipping.country}
-                          </span>
-                        </>
-                      )}
-                    </span>
-                  </div>
-                </div>
-
-                {submitError && (
-                  <p
-                    className="text-sm text-red-500 border border-red-500/30 bg-red-500/10 px-4 py-3"
-                    role="alert"
-                  >
-                    {submitError}
-                  </p>
-                )}
-
-                <div className="flex items-center gap-3 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSubmitError(null);
-                      setStep("account");
-                    }}
-                    className="text-[11px] font-bold uppercase tracking-widest text-muted hover:text-text transition-colors"
-                  >
-                    ← Atrás
-                  </button>
-                  <Button type="submit" size="lg" disabled={submitting}>
-                    <Lock className="w-3.5 h-3.5" />
-                    {submitting
-                      ? "Creando pedido..."
-                      : `Confirmar pago · ${formatPriceDecimal(total)}`}
-                  </Button>
-                </div>
-
-                <p className="flex items-center gap-2 text-[11px] text-muted pt-2">
-                  <Lock className="w-3 h-3 text-faint shrink-0" />
-                  Tus datos se usan solo para procesar este pedido.
-                </p>
-              </div>
-            )}
-          </form>
+        <div className="mb-8 text-center">
+          <h1 className="mb-2 text-3xl font-bold text-balance">
+            Checkout seguro
+          </h1>
+          <p className="text-muted-foreground">
+            Completa tu compra en unos pocos pasos
+          </p>
         </div>
 
-        <div className="lg:col-span-1">
-          <div className="bg-surface border border-border p-6 sticky top-24">
-            <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-text mb-6">
-              Tu pedido
-            </h2>
-
-            <div className="space-y-4 mb-6 max-h-72 overflow-y-auto">
-              {items.map((item) => (
+        <div className="mb-8 flex justify-center">
+          <div className="flex items-center gap-4">
+            {[1, 2].map((stepNumber) => (
+              <div key={stepNumber} className="flex items-center">
                 <div
-                  key={`${item.product.id}-${item.selectedColor.name}-${item.selectedSize}`}
-                  className="flex gap-3"
-                >
-                  <div className="relative w-14 h-14 bg-surface-2 shrink-0 overflow-hidden">
-                    <Image
-                      src={item.product.images[0]}
-                      alt={item.product.name}
-                      fill
-                      className="object-cover"
-                      sizes="56px"
-                    />
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-bg text-[9px] font-black flex items-center justify-center rounded-full">
-                      {item.quantity}
-                    </span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-bold text-text leading-tight truncate">
-                      {item.product.name}
-                    </p>
-                    <p className="text-[10px] text-muted mt-0.5">
-                      {item.selectedColor.name} · {item.selectedSize}
-                    </p>
-                  </div>
-                  <span className="text-xs font-bold text-text shrink-0">
-                    {formatPrice(item.product.price * item.quantity)}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            <div className="border-t border-border pt-4 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted">Subtotal</span>
-                <span className="text-sm font-bold text-text">
-                  {formatPrice(cartTotal)}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted">
-                  {shipping.fulfillment === "pickup"
-                    ? "Envío (recogida)"
-                    : "Envío a domicilio"}
-                </span>
-                <span className="text-sm font-bold text-text">
-                  {shippingCost === 0 ? (
-                    <span className="text-green-600 dark:text-green-500">
-                      {formatPrice(0)}
-                    </span>
-                  ) : (
-                    formatPriceDecimal(shippingCost)
+                  className={cn(
+                    "flex size-10 items-center justify-center rounded-full text-sm font-medium transition-colors",
+                    stepNumber <= currentStepNumber
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground"
                   )}
-                </span>
+                >
+                  {stepNumber}
+                </div>
+                {stepNumber < 2 ? (
+                  <div
+                    className={cn(
+                      "mx-4 h-1 w-16 rounded transition-colors",
+                      stepNumber < currentStepNumber ? "bg-primary" : "bg-muted"
+                    )}
+                  />
+                ) : null}
               </div>
-              <div className="flex items-center justify-between pt-3 border-t border-border">
-                <span className="text-xs font-black uppercase tracking-widest text-text">
-                  Total
-                </span>
-                <span className="text-xl font-black text-text">
-                  {formatPriceDecimal(total)}
-                </span>
-              </div>
-            </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid gap-8 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-balance">
+                  {step === "contact" && "Información de contacto"}
+                  {step === "shipping" && "Dirección de envío"}
+                </CardTitle>
+                <CardDescription>
+                  {step === "contact" &&
+                    "Usaremos estos datos para enviarte actualizaciones del pedido"}
+                  {step === "shipping" &&
+                    "Indica la entrega. El siguiente paso será el pago en un proceso externo (próximamente)."}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-6">
+                <form onSubmit={handlePlaceOrder} noValidate>
+                  {submitError ? (
+                    <p
+                      className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+                      role="alert"
+                    >
+                      {submitError}
+                    </p>
+                  ) : null}
+
+                  {step === "contact" ? (
+                    <div className="flex flex-col gap-4">
+                      {userLoading ? (
+                        <div className="flex items-center gap-3 py-8 text-muted-foreground">
+                          <Loader2 className="size-5 animate-spin" />
+                          <span className="text-sm">Comprobando sesión…</span>
+                        </div>
+                      ) : !user ? (
+                        <div className="flex flex-col gap-6 rounded-lg border bg-muted/40 p-6">
+                          <p className="text-sm leading-relaxed text-muted-foreground">
+                            Para continuar debes iniciar sesión. Asociaremos el
+                            pedido a tu cuenta y usaremos tu perfil para el
+                            contacto.
+                          </p>
+                          <div className="flex flex-col gap-3 sm:flex-row">
+                            <Button asChild>
+                              <Link href={loginHref}>Iniciar sesión</Link>
+                            </Button>
+                            <Button variant="outline" asChild>
+                              <Link href={signupHref}>Crear cuenta</Link>
+                            </Button>
+                          </div>
+                        </div>
+                      ) : !accountReady ? (
+                        <div className="flex items-center gap-3 py-8 text-muted-foreground">
+                          <Loader2 className="size-5 animate-spin" />
+                          <span className="text-sm">Cargando tu perfil…</span>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex flex-col gap-2">
+                            <Label htmlFor="checkout-email">
+                              Correo electrónico
+                            </Label>
+                            <Input
+                              id="checkout-email"
+                              type="email"
+                              autoComplete="email"
+                              placeholder="correo@ejemplo.com"
+                              value={contactParts!.email}
+                              disabled
+                              className="h-9 bg-muted/50"
+                            />
+                          </div>
+
+                          <div className="grid gap-4 md:grid-cols-2">
+                            <div className="flex flex-col gap-2">
+                              <Label htmlFor="checkout-firstName">
+                                Nombre
+                              </Label>
+                              <Input
+                                id="checkout-firstName"
+                                autoComplete="given-name"
+                                placeholder="Juan"
+                                value={contactParts!.firstName}
+                                disabled
+                                className="h-9 bg-muted/50"
+                              />
+                            </div>
+                            <div className="flex flex-col gap-2">
+                              <Label htmlFor="checkout-lastName">Apellidos</Label>
+                              <Input
+                                id="checkout-lastName"
+                                autoComplete="family-name"
+                                placeholder="Pérez"
+                                value={contactParts!.lastName}
+                                disabled
+                                className="h-9 bg-muted/50"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col gap-2">
+                            <Label htmlFor="checkout-phone">
+                              Teléfono
+                            </Label>
+                            <Input
+                              id="checkout-phone"
+                              name="phone"
+                              type="tel"
+                              autoComplete="tel"
+                              placeholder="+502 5555 0000"
+                              value={contactPhone}
+                              onChange={(e) => setContactPhone(e.target.value)}
+                              className="h-9"
+                              required
+                              aria-required
+                            />
+                            <p className="text-xs text-muted-foreground">
+                              Lo usamos para coordinar la entrega o la recogida.
+                            </p>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ) : null}
+
+                  {step === "shipping" ? (
+                    <div className="flex flex-col gap-6">
+                      <div className="flex flex-col gap-4">
+                        <Label className="text-sm font-medium">
+                          ¿Cómo recibes tu pedido?
+                        </Label>
+                        <RadioGroup
+                          value={shipping.fulfillment}
+                          onValueChange={(value) =>
+                            setShipping((s) => ({
+                              ...s,
+                              fulfillment: value as "pickup" | "delivery",
+                            }))
+                          }
+                          className="flex flex-col gap-3"
+                        >
+                          <label
+                            htmlFor="fulfillment-pickup"
+                            className={cn(
+                              "flex cursor-pointer items-center gap-3 rounded-lg border p-4 transition-colors",
+                              shipping.fulfillment === "pickup" &&
+                                "border-primary bg-primary/5"
+                            )}
+                          >
+                            <RadioGroupItem
+                              value="pickup"
+                              id="fulfillment-pickup"
+                            />
+                            <Store className="size-5 text-muted-foreground" />
+                            <div className="flex-1">
+                              <p className="text-sm font-medium">
+                                Recoger en tienda
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                Sin costo de envío
+                              </p>
+                            </div>
+                            <span className="text-sm font-medium">
+                              {formatPrice(0)}
+                            </span>
+                          </label>
+                          <label
+                            htmlFor="fulfillment-delivery"
+                            className={cn(
+                              "flex cursor-pointer items-center gap-3 rounded-lg border p-4 transition-colors",
+                              shipping.fulfillment === "delivery" &&
+                                "border-primary bg-primary/5"
+                            )}
+                          >
+                            <RadioGroupItem
+                              value="delivery"
+                              id="fulfillment-delivery"
+                            />
+                            <Truck className="size-5 text-muted-foreground" />
+                            <div className="flex-1">
+                              <p className="text-sm font-medium">
+                                Envío a domicilio
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                Entrega en tu dirección
+                              </p>
+                            </div>
+                            <span className="text-sm font-medium">
+                              {formatPriceDecimal(CHECKOUT_SHIPPING_FEE_GTQ)}
+                            </span>
+                          </label>
+                        </RadioGroup>
+                      </div>
+
+                      {shipping.fulfillment === "delivery" ? (
+                        <div className="flex flex-col gap-4">
+                          <div className="flex flex-col gap-2">
+                            <Label htmlFor="shipping-address">
+                              Dirección
+                            </Label>
+                            <Input
+                              id="shipping-address"
+                              name="address"
+                              autoComplete="street-address"
+                              placeholder="Calle Principal 123"
+                              value={shipping.address}
+                              onChange={(e) =>
+                                setShipping((s) => ({
+                                  ...s,
+                                  address: e.target.value,
+                                }))
+                              }
+                              className="h-9"
+                              required
+                            />
+                          </div>
+
+                          <div className="flex flex-col gap-2">
+                            <Label htmlFor="shipping-address2">
+                              Dirección línea 2{" "}
+                              <span className="font-normal text-muted-foreground">
+                                (opcional)
+                              </span>
+                            </Label>
+                            <Input
+                              id="shipping-address2"
+                              name="address2"
+                              autoComplete="address-line2"
+                              placeholder="Depto., interior, referencia"
+                              value={shipping.address2}
+                              onChange={(e) =>
+                                setShipping((s) => ({
+                                  ...s,
+                                  address2: e.target.value,
+                                }))
+                              }
+                              className="h-9"
+                            />
+                          </div>
+
+                          <div className="grid gap-4 md:grid-cols-2">
+                            <div className="flex flex-col gap-2">
+                              <Label htmlFor="shipping-city">Ciudad</Label>
+                              <Input
+                                id="shipping-city"
+                                name="city"
+                                autoComplete="address-level2"
+                                placeholder="Ciudad de Guatemala"
+                                value={shipping.city}
+                                onChange={(e) =>
+                                  setShipping((s) => ({
+                                    ...s,
+                                    city: e.target.value,
+                                  }))
+                                }
+                                className="h-9"
+                                required
+                              />
+                            </div>
+                            <div className="flex flex-col gap-2">
+                              <Label htmlFor="shipping-state">
+                                Departamento / municipio
+                              </Label>
+                              <Input
+                                id="shipping-state"
+                                name="state"
+                                autoComplete="address-level1"
+                                placeholder="Guatemala"
+                                value={shipping.state}
+                                onChange={(e) =>
+                                  setShipping((s) => ({
+                                    ...s,
+                                    state: e.target.value,
+                                  }))
+                                }
+                                className="h-9"
+                                required
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid gap-4 md:grid-cols-2">
+                            <div className="flex flex-col gap-2">
+                              <Label htmlFor="shipping-postalCode">
+                                Código postal
+                              </Label>
+                              <Input
+                                id="shipping-postalCode"
+                                name="postalCode"
+                                autoComplete="postal-code"
+                                placeholder="01010"
+                                value={shipping.postalCode}
+                                onChange={(e) =>
+                                  setShipping((s) => ({
+                                    ...s,
+                                    postalCode: e.target.value,
+                                  }))
+                                }
+                                className="h-9"
+                                required
+                              />
+                            </div>
+                            <div className="flex flex-col gap-2">
+                              <Label htmlFor="shipping-country">País</Label>
+                              <Select
+                                value={shipping.country}
+                                onValueChange={(value) =>
+                                  setShipping((s) => ({ ...s, country: value }))
+                                }
+                              >
+                                <SelectTrigger
+                                  id="shipping-country"
+                                  className="h-9 w-full"
+                                >
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent position="popper">
+                                  <SelectItem value="Guatemala">
+                                    Guatemala
+                                  </SelectItem>
+                                  <SelectItem value="México">México</SelectItem>
+                                  <SelectItem value="Estados Unidos">
+                                    Estados Unidos
+                                  </SelectItem>
+                                  <SelectItem value="Colombia">
+                                    Colombia
+                                  </SelectItem>
+                                  <SelectItem value="Argentina">
+                                    Argentina
+                                  </SelectItem>
+                                  <SelectItem value="España">España</SelectItem>
+                                  <SelectItem value="Chile">Chile</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                        </div>
+                      ) : null}
+                    </div>
+                  ) : null}
+
+                  <div className="flex justify-between pt-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={prevStep}
+                      disabled={step === "contact"}
+                      className="flex h-9 cursor-pointer items-center gap-2 px-4"
+                    >
+                      <ArrowLeft className="size-4" />
+                      Atrás
+                    </Button>
+
+                    {step === "contact" && accountReady ? (
+                      <Button
+                        type="button"
+                        onClick={goToShipping}
+                        className="h-9 cursor-pointer px-4"
+                      >
+                        Continuar
+                      </Button>
+                    ) : null}
+
+                    {step === "shipping" ? (
+                      <Button
+                        type="submit"
+                        disabled={submitting}
+                        className="flex h-9 cursor-pointer items-center gap-2 px-4"
+                      >
+                        <CreditCard className="size-4" />
+                        {submitting
+                          ? "Procesando…"
+                          : `Continuar al pago · ${formatPriceDecimal(total)}`}
+                      </Button>
+                    ) : null}
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="lg:col-span-1">
+            <Card className="sticky top-8">
+              <CardHeader>
+                <CardTitle className="text-balance">Resumen del pedido</CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-4">
+                <div className="flex max-h-72 flex-col gap-4 overflow-y-auto">
+                  {items.map((item) => (
+                    <div
+                      key={`${item.product.id}-${item.selectedColor.name}-${item.selectedSize}`}
+                      className="flex gap-4"
+                    >
+                      <div className="relative shrink-0">
+                        <div className="relative size-16 overflow-hidden rounded-lg bg-muted">
+                          <Image
+                            src={item.product.images[0]}
+                            alt={item.product.name}
+                            fill
+                            className="object-cover"
+                            sizes="64px"
+                          />
+                        </div>
+                        <Badge
+                          variant="secondary"
+                          className="absolute -top-2 -right-2 size-6 rounded-full p-0 text-xs font-semibold"
+                        >
+                          {item.quantity}
+                        </Badge>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="truncate text-sm font-medium">
+                          {item.product.name}
+                        </h4>
+                        <p className="text-xs text-muted-foreground">
+                          {item.selectedColor.name} · {item.selectedSize}
+                        </p>
+                        <p className="mt-1 text-sm font-medium">
+                          {formatPrice(item.product.price * item.quantity)}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <Separator />
+
+                <div className="flex flex-col gap-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Subtotal</span>
+                    <span>{formatPrice(cartTotal)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="flex items-center gap-1 text-muted-foreground">
+                      <Truck className="size-3" />
+                      {shipping.fulfillment === "pickup"
+                        ? "Recogida en tienda"
+                        : "Envío a domicilio"}
+                    </span>
+                    <span>
+                      {shippingCost === 0
+                        ? formatPrice(0)
+                        : formatPriceDecimal(shippingCost)}
+                    </span>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="flex justify-between font-semibold">
+                  <span>Total</span>
+                  <span>{formatPriceDecimal(total)}</span>
+                </div>
+
+                <div className="flex flex-col gap-3 pt-2">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Shield className="size-4 text-green-600" />
+                    <span>Checkout seguro</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Truck className="size-4 text-blue-600" />
+                    <span>Envío a domicilio o recogida en tienda</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Gift className="size-4 text-purple-600" />
+                    <span>Tus datos protegidos</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
@@ -876,10 +821,12 @@ function CheckoutFlow() {
 
 function CheckoutFallback() {
   return (
-    <div className="max-w-7xl mx-auto px-4 py-24">
-      <div className="flex items-center gap-3 text-muted">
-        <Loader2 className="w-5 h-5 animate-spin" />
-        <span className="text-sm">Cargando checkout…</span>
+    <div className="bg-muted/30">
+      <div className="mx-auto max-w-7xl px-4 py-24">
+        <div className="flex items-center gap-3 text-muted-foreground">
+          <Loader2 className="size-5 animate-spin" />
+          <span className="text-sm">Cargando checkout…</span>
+        </div>
       </div>
     </div>
   );
