@@ -76,14 +76,6 @@ export function StorefrontHero2() {
                   />
                 </Link>
               </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="min-w-44 h-12 cursor-pointer rounded-2xl border-border/60 bg-foreground/3 px-7 text-sm font-semibold text-text shadow-none backdrop-blur-sm transition-[border-color,background-color,color,box-shadow] duration-200 ease-out hover:border-primary/35 hover:bg-primary/8 hover:text-primary focus-visible:ring-primary/30 sm:h-11"
-                asChild
-              >
-                <Link href="/products">Ver catálogo</Link>
-              </Button>
             </div>
 
 

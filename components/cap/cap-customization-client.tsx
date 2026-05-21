@@ -166,8 +166,8 @@ export function CapCustomizationClient() {
                   className={[
                     "flex-1 py-2 text-[11px] font-bold uppercase tracking-[0.15em] border transition-colors cursor-pointer",
                     modelType === type
-                      ? "border-text bg-text text-background"
-                      : "border-border text-muted hover:border-text hover:text-text",
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border text-muted hover:border-primary hover:text-primary",
                   ].join(" ")}
                 >
                   {CAP_MODEL_CONFIGS[type].label}
@@ -292,9 +292,6 @@ export function CapCustomizationClient() {
             >
               <RotateCcw className="w-3.5 h-3.5" />
               Restablecer
-            </Button>
-            <Button asChild size="sm" className="flex-1 sm:flex-none cursor-pointer">
-              <Link href="/products">Ver catálogo</Link>
             </Button>
           </div>
         </div>
