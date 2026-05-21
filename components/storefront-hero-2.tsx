@@ -58,26 +58,34 @@ export function StorefrontHero2() {
               Convierte tu idea en una pieza única diseñada para representar tu estilo, identidad o marca.
             </p>
 
-            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+            <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
               <Button
                 size="lg"
-                className="h-12 rounded-full bg-primary px-7 text-sm font-semibold text-primary-foreground hover:bg-primary/90 sm:h-11"
+                className="group relative h-12 min-w-44 px-10 cursor-pointer overflow-hidden rounded-2xl border border-[#e8d9a8]/30 bg-linear-to-b from-[#e0c878] via-primary to-[#9a7f3f] text-sm font-semibold tracking-wide text-primary-foreground shadow-[0_4px_24px_rgba(193,161,88,0.28),inset_0_1px_0_rgba(255,255,255,0.35)] transition-[box-shadow,filter,border-color] duration-200 ease-out hover:border-[#f0e4b8]/45 hover:shadow-[0_8px_32px_rgba(193,161,88,0.42),inset_0_1px_0_rgba(255,255,255,0.45)] hover:brightness-105 focus-visible:ring-primary/50 focus-visible:ring-offset-background active:brightness-95 motion-reduce:transition-none sm:h-11"
                 asChild
               >
-                <Link href="/products">
-                  Diseña la tuya
-                  <ArrowRight className="size-4" aria-hidden />
+                <Link href="/personalizar">
+                  <span
+                    className="pointer-events-none absolute inset-0 bg-linear-to-r from-transparent via-white/15 to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100 motion-reduce:transition-none"
+                    aria-hidden
+                  />
+                  <span className="relative">Diseña la tuya</span>
+                  <ArrowRight
+                    className="relative size-4 transition-transform duration-200 group-hover:translate-x-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0"
+                    aria-hidden
+                  />
                 </Link>
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="h-12 rounded-full border-border/80 bg-transparent px-7 text-sm font-semibold text-text hover:border-primary/40 hover:bg-primary/5 hover:text-primary sm:h-11"
+                className="min-w-44 h-12 cursor-pointer rounded-2xl border-border/60 bg-foreground/3 px-7 text-sm font-semibold text-text shadow-none backdrop-blur-sm transition-[border-color,background-color,color,box-shadow] duration-200 ease-out hover:border-primary/35 hover:bg-primary/8 hover:text-primary focus-visible:ring-primary/30 sm:h-11"
                 asChild
               >
-                <Link href="/products">Ver colección</Link>
+                <Link href="/products">Ver catálogo</Link>
               </Button>
             </div>
+
 
             <ul className="flex-wrap flex gap-x-6 gap-y-4 pt-1 sm:gap-x-8 sm:pt-2">
               {features.map(({ icon: Icon, label }) => (
