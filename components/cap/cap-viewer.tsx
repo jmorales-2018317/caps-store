@@ -7,10 +7,50 @@ import {
   Environment,
   OrbitControls,
   PerspectiveCamera,
+  useProgress,
 } from "@react-three/drei";
-import { Suspense } from "react";
+import { Loader2 } from "lucide-react";
+import { Suspense, useEffect, useRef } from "react";
 import { CapModel } from "@/components/cap/cap-model";
 import { CAP_MODEL_CONFIGS, type CapModelType } from "@/lib/cap-colors";
+
+function CapViewerLoadingOverlay() {
+  const { active, progress } = useProgress();
+  const hasLoadedOnce = useRef(false);
+
+  useEffect(() => {
+    if (!active) hasLoadedOnce.current = true;
+  }, [active]);
+
+  const show = active || !hasLoadedOnce.current;
+  if (!show) return null;
+
+  return (
+    <div
+      className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-surface/90 backdrop-blur-[2px]"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+      aria-label="Cargando modelo 3D"
+    >
+      <Loader2 className="size-8 animate-spin text-muted" aria-hidden />
+      <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted">
+        Cargando modelo 3D
+      </p>
+      {progress > 0 && progress < 100 ? (
+        <div
+          className="h-0.5 w-28 overflow-hidden bg-border"
+          aria-hidden
+        >
+          <div
+            className="h-full bg-primary transition-[width] duration-200 ease-out"
+            style={{ width: `${Math.round(progress)}%` }}
+          />
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 type CapViewerProps = {
   modelType: CapModelType;
@@ -80,19 +120,22 @@ export function CapViewer({
   logoScale,
 }: CapViewerProps) {
   return (
-    <Canvas
-      className="h-full w-full touch-none"
-      shadows
-      dpr={[1, 2]}
-      gl={{ antialias: true, alpha: true }}
-    >
-      <Scene
-        modelType={modelType}
-        fabricColor={fabricColor}
-        buttonColor={buttonColor}
-        logoUrl={logoUrl}
-        logoScale={logoScale}
-      />
-    </Canvas>
+    <div className="relative h-full w-full">
+      <CapViewerLoadingOverlay />
+      <Canvas
+        className="h-full w-full touch-none"
+        shadows
+        dpr={[1, 2]}
+        gl={{ antialias: true, alpha: true }}
+      >
+        <Scene
+          modelType={modelType}
+          fabricColor={fabricColor}
+          buttonColor={buttonColor}
+          logoUrl={logoUrl}
+          logoScale={logoScale}
+        />
+      </Canvas>
+    </div>
   );
 }
